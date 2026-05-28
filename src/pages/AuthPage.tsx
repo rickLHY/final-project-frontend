@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n } from '../i18n';
 import apiService from '../services/api';
@@ -17,7 +17,7 @@ declare global {
       accounts: {
         id: {
           initialize: (cfg: object) => void;
-          prompt: () => void;
+          renderButton: (el: HTMLElement, cfg: object) => void;
         };
       };
     };
@@ -43,14 +43,14 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [lookupLoading, setLookupLoading] = useState(false);
 
+  const googleBtnRef = useRef<HTMLDivElement>(null);
   const { login, register } = useAuth();
   const { t } = useI18n();
 
-  // ── Google Identity Services ──────────────────────────────────────────────
+  // ── Step 1: initialize Google GIS when script is ready ────────────────────
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID) return;
 
-    // Stable global callback (not a closure over React state)
     window.__thsrGoogleCb = async (response) => {
       setError(null);
       setLoading(true);
@@ -70,19 +70,17 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
           client_id: GOOGLE_CLIENT_ID,
           callback: (resp: { credential: string }) => window.__thsrGoogleCb?.(resp),
           auto_select: false,
-          cancel_on_tap_outside: true,
-          use_fedcm_for_prompt: false,  // disable FedCM, use legacy popup
+          use_fedcm_for_prompt: false,
         });
         setGoogleReady(true);
       } catch (e) {
-        console.warn('Google GIS init failed:', e);
+        console.warn('Google GIS init error:', e);
       }
     };
 
     if (window.google?.accounts?.id) {
       initGoogle();
     } else {
-      // Script loaded via index.html — poll until ready
       const timer = setInterval(() => {
         if (window.google?.accounts?.id) {
           clearInterval(timer);
@@ -93,13 +91,18 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
     }
   }, []);
 
-  const handleGoogleClick = () => {
-    if (!window.google?.accounts?.id) {
-      setError('Google 登入尚未就緒，請稍候再試');
-      return;
-    }
-    window.google.accounts.id.prompt();
-  };
+  // ── Step 2: render the button once GIS is ready and div is in DOM ─────────
+  useEffect(() => {
+    if (!googleReady || !googleBtnRef.current || !window.google?.accounts?.id) return;
+    window.google.accounts.id.renderButton(googleBtnRef.current, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      locale: 'zh-TW',
+      width: Math.min(googleBtnRef.current.offsetWidth || 300, 400),
+    });
+  }, [googleReady, tab]); // re-render when tab switches back to 'auth'
 
   // ── Email / password ──────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,7 +147,6 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* ── Top tabs ── */}
         <div className="auth-tabs">
           <button type="button" className={tab === 'auth' ? 'active' : ''} onClick={() => setTab('auth')}>
             會員登入
@@ -154,7 +156,6 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
           </button>
         </div>
 
-        {/* ── Auth tab ── */}
         {tab === 'auth' && (
           <>
             <h2>{mode === 'login' ? t('login') : t('register')}</h2>
@@ -198,25 +199,16 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
               )}
             </form>
 
-            {/* Google sign-in */}
             {GOOGLE_CLIENT_ID && (
               <div className="google-signin-wrapper">
                 <div className="divider"><span>或</span></div>
-                <button
-                  type="button"
-                  className="google-signin-btn"
-                  onClick={handleGoogleClick}
-                  disabled={loading}
-                >
-                  <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                    <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                    <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-                  </svg>
-                  使用 Google 帳號登入
-                  {!googleReady && <span className="google-loading"> ...</span>}
-                </button>
+                {/* Google renders its official button into this div */}
+                <div ref={googleBtnRef} className="google-btn-container" />
+                {!googleReady && (
+                  <p style={{ textAlign: 'center', color: '#888', fontSize: '0.8rem', margin: '8px 0' }}>
+                    Google 登入載入中...
+                  </p>
+                )}
               </div>
             )}
 
@@ -240,7 +232,6 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
           </>
         )}
 
-        {/* ── Booking lookup tab ── */}
         {tab === 'lookup' && (
           <div className="lookup-section">
             <h2>訂位代號查詢</h2>
