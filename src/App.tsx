@@ -13,9 +13,11 @@ import { BookingConfirm } from './pages/BookingConfirm';
 import { PaymentPage } from './pages/PaymentPage';
 import { MyBookings } from './pages/MyBookings';
 import { WaitlistPage } from './pages/Waitlist';
+import { NonReservedPage } from './pages/NonReservedPage';
+import { PeakSalesPage } from './pages/PeakSalesPage';
 import type { Order, Schedule, Station } from './types';
 
-export type AppPage = 'search' | 'seats' | 'confirm' | 'payment' | 'orders' | 'waitlist';
+export type AppPage = 'search' | 'seats' | 'confirm' | 'payment' | 'orders' | 'waitlist' | 'non-reserved' | 'peak-sales';
 
 function App() {
   const { user, loading } = useAuth();
@@ -70,7 +72,7 @@ function App() {
     }
 
     if (page === 'search') {
-      return <SearchPage onSelectSchedule={handleSelectSchedule} />;
+      return <SearchPage onSelectSchedule={handleSelectSchedule} onNavigate={setPage} />;
     }
 
     if (page === 'seats' && selectedSchedule && searchSelection) {
@@ -113,6 +115,14 @@ function App() {
 
     if (page === 'waitlist') {
       return <WaitlistPage stations={stations} />;
+    }
+
+    if (page === 'non-reserved') {
+      return <NonReservedPage stations={stations} />;
+    }
+
+    if (page === 'peak-sales') {
+      return <PeakSalesPage />;
     }
 
     return <SearchPage onSelectSchedule={handleSelectSchedule} />;

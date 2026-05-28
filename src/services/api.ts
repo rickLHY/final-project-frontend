@@ -15,6 +15,8 @@ import type {
   CreateOrderRequest,
   Waitlist,
   SearchParams,
+  NonReservedAvailability,
+  PeakSalesSummary,
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://courier-relive-rival.ngrok-free.dev';
@@ -314,6 +316,25 @@ class ApiService {
     a.download = 'my-orders.csv';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async getNonReservedAvailability(departureDate: string, stationId: number): Promise<NonReservedAvailability[]> {
+    const params = new URLSearchParams({
+      departure_date: departureDate,
+      station_id: stationId.toString(),
+    });
+    const response = await fetch(`${API_BASE_URL}/schedules/non-reserved-availability?${params}`, {
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse<NonReservedAvailability[]>(response);
+  }
+
+  async getPeakSales(startDate: string, endDate: string): Promise<PeakSalesSummary[]> {
+    const params = new URLSearchParams({ start_date: startDate, end_date: endDate });
+    const response = await fetch(`${API_BASE_URL}/schedules/peak-sales?${params}`, {
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse<PeakSalesSummary[]>(response);
   }
 
   async cancelWaitlist(waitlistId: number): Promise<void> {

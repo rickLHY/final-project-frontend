@@ -169,6 +169,32 @@ export interface SearchParams {
   end_station_id: number;
 }
 
+// Non-reserved availability
+export interface NonReservedAvailability {
+  schedule_id: number;
+  train_no: string;
+  train_type: string;
+  departure_time: string | null;
+  non_reserved_total: number;
+  non_reserved_sold: number;
+  non_reserved_available: number;
+  congestion_level: 'low' | 'medium' | 'high' | 'full';
+}
+
+// Peak sales summary
+export interface PeakSalesSummary {
+  schedule_id: number;
+  train_no: string;
+  train_type: string;
+  departure_date: string;
+  first_departure_time: string | null;
+  last_arrival_time: string | null;
+  total_seats: number;
+  sold_seats: number;
+  available_seats: number;
+  occupancy_rate: number;
+}
+
 // Booking context types
 export interface BookingState {
   selectedSchedule: ScheduleDetail | null;

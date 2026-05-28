@@ -224,11 +224,6 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
               )}
             </div>
 
-            <div className="demo-accounts">
-              <p>{t('demoAccounts')}</p>
-              <p><strong>{t('admin')}:</strong> admin@thsr.com / admin1234</p>
-              <p><strong>{t('generalUser')}:</strong> user@thsr.com / user1234</p>
-            </div>
           </>
         )}
 

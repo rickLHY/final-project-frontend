@@ -8,6 +8,7 @@ import '../styles/SearchPage.css';
 
 interface SearchPageProps {
   onSelectSchedule: (schedule: Schedule, selection: SearchSelection) => void;
+  onNavigate?: (page: import('../App').AppPage) => void;
 }
 
 export interface SearchSelection {
@@ -16,7 +17,7 @@ export interface SearchSelection {
   departureDate: string;
 }
 
-export function SearchPage({ onSelectSchedule }: SearchPageProps) {
+export function SearchPage({ onSelectSchedule, onNavigate }: SearchPageProps) {
   const [stations, setStations] = useState<Station[]>([]);
   const [startStationId, setStartStationId] = useState<number>(0);
   const [endStationId, setEndStationId] = useState<number>(0);
@@ -111,9 +112,9 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
       <div className="search-card">
         <div className="query-tabs" aria-label="查詢類型">
           <button type="button" className="active">{t('tabTimetableFare')}</button>
-          <button type="button">{t('tabOnlineBooking')}</button>
-          <button type="button">{t('tabNonReserved')}</button>
-          <button type="button">{t('tabHolidaySales')}</button>
+          <button type="button" onClick={() => onNavigate?.('search')}>{t('tabOnlineBooking')}</button>
+          <button type="button" onClick={() => onNavigate?.('non-reserved')}>{t('tabNonReserved')}</button>
+          <button type="button" onClick={() => onNavigate?.('peak-sales')}>{t('tabHolidaySales')}</button>
         </div>
 
         <div className="search-heading">
