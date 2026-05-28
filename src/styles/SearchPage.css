@@ -4,16 +4,20 @@
 }
 
 .service-hero {
-  min-height: 138px;
+  min-height: 200px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 28px;
   align-items: center;
-  padding: 24px 30px;
+  padding: 36px 30px;
   margin-bottom: 16px;
   color: #fff;
-  background: linear-gradient(105deg, #dd5000, #f47721);
+  position: relative;
+  overflow: hidden;
   border-bottom: 4px solid #343a40;
+  background:
+    linear-gradient(105deg, rgba(180,50,0,0.82) 0%, rgba(200,80,0,0.60) 55%, rgba(0,0,0,0.30) 100%),
+    url('/thsr-bg.jpg') center 40% / cover no-repeat;
 }
 
 .hero-kicker {
@@ -236,6 +240,53 @@
 
 .schedules-list {
   padding: 0;
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-color, #333);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #f47721;
+  color: #f47721;
+}
+
+.page-btn.active {
+  background: #f47721;
+  border-color: #f47721;
+  color: #fff;
+  font-weight: 700;
+}
+
+.page-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 0.8rem;
+  color: #888;
+  margin-left: 8px;
 }
 
 .result-title {

@@ -1,12 +1,16 @@
 .app {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--background-color);
 }
 
 .page-container {
+  flex: 1;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 18px 46px;
+  width: 100%;
 }
 
 .app-loading {

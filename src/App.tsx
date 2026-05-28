@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import './styles/globals.css';
 import './App.css';
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
+import './styles/Footer.css';
 import { useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { AuthPage } from './pages/AuthPage';
@@ -128,6 +130,7 @@ function App() {
     <div className="app">
       <Header currentPage={page} onNavigate={setPage} />
       <main className="page-container">{renderPage()}</main>
+      <Footer />
     </div>
   );
 }

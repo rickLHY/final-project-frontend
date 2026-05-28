@@ -26,6 +26,8 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 8;
   const { t } = useI18n();
 
   const loadStations = async () => {
@@ -65,6 +67,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
       });
 
       setSchedules(data);
+      setCurrentPage(1);
       if (data.length === 0) {
         setError(t('noSchedules'));
       }
@@ -211,51 +214,76 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
         </form>
       </div>
 
-      {schedules.length > 0 && (
-        <div className="schedules-list">
-          <div className="result-title">
-            <h3>{t('resultTitle')}</h3>
-            <span>{t('trainsCount', { count: schedules.length })}</span>
-          </div>
-          {schedules.map((schedule) => (
-            <div key={schedule.schedule_id} className="schedule-card">
-              <div className="schedule-info">
-                <div className="route">
-                  <span className="station-from">{getStationName(startStationId)}</span>
-                  <span className="arrow">→</span>
-                  <span className="station-to">{getStationName(endStationId)}</span>
-                </div>
-                <div className="details">
-                  <p>
-                    <strong>{t('trainNo')}:</strong> {schedule.train_no}
-                  </p>
-                  <p>
-                    <strong>{t('departureTime')}:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}
-                  </p>
-                  <p>
-                    <strong>{t('arrivalTime')}:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}
-                  </p>
-                  <p>
-                    <strong>{t('date')}:</strong> {schedule.departure_date}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() =>
-                  onSelectSchedule(schedule, {
-                    startStationId,
-                    endStationId,
-                    departureDate,
-                  })
-                }
-                className="btn-primary"
-              >
-                {t('selectSchedule')}
-              </button>
+      {schedules.length > 0 && (() => {
+        const totalPages = Math.ceil(schedules.length / PAGE_SIZE);
+        const paginated = schedules.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+        return (
+          <div className="schedules-list">
+            <div className="result-title">
+              <h3>{t('resultTitle')}</h3>
+              <span>{t('trainsCount', { count: schedules.length })}</span>
             </div>
-          ))}
-        </div>
-      )}
+
+            {paginated.map((schedule) => (
+              <div key={schedule.schedule_id} className="schedule-card">
+                <div className="schedule-info">
+                  <div className="route">
+                    <span className="station-from">{getStationName(startStationId)}</span>
+                    <span className="arrow">→</span>
+                    <span className="station-to">{getStationName(endStationId)}</span>
+                  </div>
+                  <div className="details">
+                    <p><strong>{t('trainNo')}:</strong> {schedule.train_no}</p>
+                    <p><strong>{t('departureTime')}:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}</p>
+                    <p><strong>{t('arrivalTime')}:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}</p>
+                    <p><strong>{t('date')}:</strong> {schedule.departure_date}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onSelectSchedule(schedule, { startStationId, endStationId, departureDate })}
+                  className="btn-primary"
+                >
+                  {t('selectSchedule')}
+                </button>
+              </div>
+            ))}
+
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  className="page-btn"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  ‹ 上一頁
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={`page-btn${currentPage === page ? ' active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  className="page-btn"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  下一頁 ›
+                </button>
+
+                <span className="page-info">
+                  第 {currentPage} / {totalPages} 頁，共 {schedules.length} 班
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
