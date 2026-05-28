@@ -69,6 +69,15 @@ class ApiService {
   }
 
   // ===== Auth =====
+  async googleLogin(credential: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+      body: JSON.stringify({ credential }),
+    });
+    return this.handleResponse<AuthResponse>(response);
+  }
+
   async register(data: RegisterRequest): Promise<User> {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
@@ -291,6 +300,20 @@ class ApiService {
       headers: this.getHeaders(),
     });
     return this.handleResponse<Waitlist[]>(response);
+  }
+
+  async exportOrdersCsv(): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/orders/export-csv`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) throw new Error('匯出失敗');
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my-orders.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   async cancelWaitlist(waitlistId: number): Promise<void> {

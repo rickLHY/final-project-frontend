@@ -89,9 +89,22 @@ export function MyBookings({ stations }: MyBookingsProps) {
     );
   }
 
+  const handleExportCsv = async () => {
+    try {
+      await apiService.exportOrdersCsv();
+    } catch {
+      alert('匯出失敗，請稍後再試');
+    }
+  };
+
   return (
     <div className="my-bookings">
-      <h2>{t('myOrders')}</h2>
+      <div className="my-bookings-header">
+        <h2>{t('myOrders')}</h2>
+        <button type="button" className="btn-export-csv" onClick={handleExportCsv}>
+          ⬇ 匯出 CSV
+        </button>
+      </div>
 
       {error && <div className="error-message">{error}</div>}
 

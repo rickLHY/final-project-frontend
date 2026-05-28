@@ -4,6 +4,27 @@
   padding: 16px;
 }
 
+.my-bookings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.my-bookings-header h2 { margin: 0; }
+
+.btn-export-csv {
+  padding: 7px 16px;
+  border: 1.5px solid #16a34a;
+  border-radius: 6px;
+  background: #fff;
+  color: #16a34a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.btn-export-csv:hover { background: #16a34a; color: #fff; }
+
 .my-bookings h2 {
   margin-bottom: 24px;
   color: var(--primary-color);

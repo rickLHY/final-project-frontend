@@ -242,6 +242,68 @@
   padding: 0;
 }
 
+/* ── Schedule filters ── */
+.schedule-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: #fafafa;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  white-space: nowrap;
+}
+
+.filter-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border-color);
+  background: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+.filter-chip:hover { border-color: #f47721; color: #f47721; }
+.filter-chip.active { background: #f47721; border-color: #f47721; color: #fff; font-weight: 600; }
+
+/* ── Train type badge ── */
+.train-type-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #e8f4ff;
+  color: #0066cc;
+  vertical-align: middle;
+}
+
+/* ── Seats badge ── */
+.seats-badge {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0;
+}
+.many-seats { color: #16a34a; }
+.few-seats  { color: #f59e0b; }
+.no-seats   { color: #dc2626; }
+
 /* ── Pagination ── */
 .pagination {
   display: flex;

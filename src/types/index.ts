@@ -71,6 +71,7 @@ export interface Schedule {
   non_reserved_start_carriage: number;
   origin_departure_time?: string | null;
   destination_arrival_time?: string | null;
+  available_seats?: number | null;
 }
 
 export interface StopTime {

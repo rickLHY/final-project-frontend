@@ -27,6 +27,8 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterType, setFilterType] = useState<'all' | 'express' | 'standard'>('all');
+  const [filterTime, setFilterTime] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
   const PAGE_SIZE = 8;
   const { t } = useI18n();
 
@@ -68,6 +70,8 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
       setSchedules(data);
       setCurrentPage(1);
+      setFilterType('all');
+      setFilterTime('all');
       if (data.length === 0) {
         setError(t('noSchedules'));
       }
@@ -215,13 +219,45 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
       </div>
 
       {schedules.length > 0 && (() => {
-        const totalPages = Math.ceil(schedules.length / PAGE_SIZE);
-        const paginated = schedules.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+        const filtered = schedules.filter((s) => {
+          if (filterType !== 'all' && s.train_type !== filterType) return false;
+          const h = parseInt(s.origin_departure_time?.slice(0, 2) ?? '12');
+          if (filterTime === 'morning' && h >= 12) return false;
+          if (filterTime === 'afternoon' && (h < 12 || h >= 18)) return false;
+          if (filterTime === 'evening' && h < 18) return false;
+          return true;
+        });
+        const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+        const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
         return (
           <div className="schedules-list">
             <div className="result-title">
               <h3>{t('resultTitle')}</h3>
-              <span>{t('trainsCount', { count: schedules.length })}</span>
+              <span>{t('trainsCount', { count: filtered.length })}</span>
+            </div>
+
+            {/* ── Filters ── */}
+            <div className="schedule-filters">
+              <div className="filter-group">
+                <span className="filter-label">車種</span>
+                {(['all', 'express', 'standard'] as const).map((v) => (
+                  <button key={v} type="button"
+                    className={`filter-chip${filterType === v ? ' active' : ''}`}
+                    onClick={() => { setFilterType(v); setCurrentPage(1); }}>
+                    {v === 'all' ? '全部' : v === 'express' ? '直達' : '站站停'}
+                  </button>
+                ))}
+              </div>
+              <div className="filter-group">
+                <span className="filter-label">時段</span>
+                {(['all', 'morning', 'afternoon', 'evening'] as const).map((v) => (
+                  <button key={v} type="button"
+                    className={`filter-chip${filterTime === v ? ' active' : ''}`}
+                    onClick={() => { setFilterTime(v); setCurrentPage(1); }}>
+                    {v === 'all' ? '全部' : v === 'morning' ? '早（~12時）' : v === 'afternoon' ? '午（12-18時）' : '晚（18時~）'}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {paginated.map((schedule) => (
@@ -233,10 +269,17 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                     <span className="station-to">{getStationName(endStationId)}</span>
                   </div>
                   <div className="details">
-                    <p><strong>{t('trainNo')}:</strong> {schedule.train_no}</p>
+                    <p><strong>{t('trainNo')}:</strong> {schedule.train_no}
+                      <span className="train-type-badge">{schedule.train_type === 'express' ? '直達' : '站站停'}</span>
+                    </p>
                     <p><strong>{t('departureTime')}:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}</p>
                     <p><strong>{t('arrivalTime')}:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}</p>
                     <p><strong>{t('date')}:</strong> {schedule.departure_date}</p>
+                    {schedule.available_seats !== null && schedule.available_seats !== undefined && (
+                      <p className={`seats-badge ${schedule.available_seats === 0 ? 'no-seats' : schedule.available_seats <= 20 ? 'few-seats' : 'many-seats'}`}>
+                        {schedule.available_seats === 0 ? '✗ 已售完' : `● 剩餘 ${schedule.available_seats} 席`}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <button
