@@ -77,8 +77,6 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
     try {
       const tokenResp = await apiService.googleLogin(response.credential);
       apiService.setToken(tokenResp.access_token);
-      const profile = await apiService.getProfile();
-      // Trigger auth context refresh by reloading
       window.location.reload();
       onSuccess?.();
     } catch (err) {
