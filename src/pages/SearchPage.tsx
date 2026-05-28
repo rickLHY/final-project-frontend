@@ -18,7 +18,6 @@ export interface SearchSelection {
   departureDate: string;
 }
 
-const LEVEL_LABEL: Record<string, string> = { low: '順暢', medium: '稍擁擠', high: '擁擠', full: '滿載' };
 const LEVEL_CLASS: Record<string, string> = { low: 'congestion-low', medium: 'congestion-medium', high: 'congestion-high', full: 'congestion-full' };
 
 function OccupancyBar({ rate }: { rate: number }) {
@@ -176,7 +175,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
         {/* ── 自由座等候時間 ── */}
         {activeTab === 'non-reserved' && (
           <div className="tab-panel">
-            <div className="search-heading"><h3>{t('tabNonReserved')}</h3><p>選擇日期與出發站，查詢各班次自由座剩餘情形。</p></div>
+            <div className="search-heading"><h3>{t('tabNonReserved')}</h3><p>{t('nonReservedDesc')}</p></div>
             <form onSubmit={handleNrSearch} className="search-form">
               <div className="form-row">
                 <div className="form-group">
@@ -186,7 +185,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 <div className="form-group">
                   <label>{t('startStation')}</label>
                   <select value={nrStationId} onChange={e => setNrStationId(e.target.value)} required>
-                    <option value="">請選擇車站</option>
+                    <option value="">{t('selectStation')}</option>
                     {stations.map(s => <option key={s.station_id} value={s.station_id}>{s.station_name}</option>)}
                   </select>
                 </div>
@@ -196,16 +195,16 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
             {nrError && <div className="error-message">{nrError}</div>}
             {nrResults !== null && (nrResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (
               <table className="data-table">
-                <thead><tr><th>{t('trainNo')}</th><th>車種</th><th>{t('departureTime')}</th><th>自由座總數</th><th>已售出</th><th>剩餘</th><th>壅擠程度</th></tr></thead>
+                <thead><tr><th>{t('trainNo')}</th><th>{t('trainType')}</th><th>{t('departureTime')}</th><th>{t('nonReservedTotal')}</th><th>{t('occupied')}</th><th>{t('remaining')}</th><th>{t('congestionLevel')}</th></tr></thead>
                 <tbody>{nrResults.map(r => (
                   <tr key={r.schedule_id}>
                     <td>{r.train_no}</td>
-                    <td>{r.train_type === 'express' ? '自強' : '莒光'}</td>
+                    <td>{r.train_type === 'express' ? t('trainTypeExpress') : t('trainTypeLocal')}</td>
                     <td>{r.departure_time?.slice(0, 5) ?? '—'}</td>
                     <td>{r.non_reserved_total}</td>
                     <td>{r.non_reserved_sold}</td>
                     <td>{r.non_reserved_available}</td>
-                    <td><span className={`congestion-badge ${LEVEL_CLASS[r.congestion_level]}`}>{LEVEL_LABEL[r.congestion_level]}</span></td>
+                    <td><span className={`congestion-badge ${LEVEL_CLASS[r.congestion_level]}`}>{t(`congestion${r.congestion_level.charAt(0).toUpperCase() + r.congestion_level.slice(1)}`)}</span></td>
                   </tr>
                 ))}</tbody>
               </table>
@@ -216,15 +215,15 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
         {/* ── 疏運期銷售資訊 ── */}
         {activeTab === 'peak-sales' && (
           <div className="tab-panel">
-            <div className="search-heading"><h3>{t('tabHolidaySales')}</h3><p>選擇日期區間，查詢各班次票務銷售狀況。</p></div>
+            <div className="search-heading"><h3>{t('tabHolidaySales')}</h3><p>{t('peakSalesDesc')}</p></div>
             <form onSubmit={handlePsSearch} className="search-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label>開始日期</label>
+                  <label>{t('startDate')}</label>
                   <input type="date" value={psStart} min={today} onChange={e => setPsStart(e.target.value)} required />
                 </div>
                 <div className="form-group">
-                  <label>結束日期</label>
+                  <label>{t('endDate')}</label>
                   <input type="date" value={psEnd} min={psStart} onChange={e => setPsEnd(e.target.value)} required />
                 </div>
                 <button type="submit" className="btn-primary" disabled={psLoading}>{psLoading ? t('searching') : t('searchSchedules')}</button>
@@ -233,12 +232,12 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
             {psError && <div className="error-message">{psError}</div>}
             {psResults !== null && (psResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (
               <table className="data-table">
-                <thead><tr><th>{t('date')}</th><th>{t('trainNo')}</th><th>車種</th><th>首班發車</th><th>末班到達</th><th>總座位</th><th>已售</th><th>剩餘</th><th>售票率</th></tr></thead>
+                <thead><tr><th>{t('date')}</th><th>{t('trainNo')}</th><th>{t('trainType')}</th><th>{t('firstDeparture')}</th><th>{t('lastArrival')}</th><th>{t('totalSeats')}</th><th>{t('soldSeats')}</th><th>{t('remaining')}</th><th>{t('occupancyRate')}</th></tr></thead>
                 <tbody>{psResults.map(r => (
                   <tr key={r.schedule_id}>
                     <td>{r.departure_date}</td>
                     <td>{r.train_no}</td>
-                    <td>{r.train_type === 'express' ? '自強' : '莒光'}</td>
+                    <td>{r.train_type === 'express' ? t('trainTypeExpress') : t('trainTypeLocal')}</td>
                     <td>{r.first_departure_time?.slice(0, 5) ?? '—'}</td>
                     <td>{r.last_arrival_time?.slice(0, 5) ?? '—'}</td>
                     <td>{r.total_seats}</td>
@@ -378,22 +377,22 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
             {/* ── Filters ── */}
             <div className="schedule-filters">
               <div className="filter-group">
-                <span className="filter-label">車種</span>
+                <span className="filter-label">{t('trainType')}</span>
                 {(['all', 'express', 'standard'] as const).map((v) => (
                   <button key={v} type="button"
                     className={`filter-chip${filterType === v ? ' active' : ''}`}
                     onClick={() => { setFilterType(v); setCurrentPage(1); }}>
-                    {v === 'all' ? '全部' : v === 'express' ? '直達' : '站站停'}
+                    {v === 'all' ? t('filterAll') : v === 'express' ? t('trainExpress') : t('trainLocal')}
                   </button>
                 ))}
               </div>
               <div className="filter-group">
-                <span className="filter-label">時段</span>
+                <span className="filter-label">{t('timePeriod')}</span>
                 {(['all', 'morning', 'afternoon', 'evening'] as const).map((v) => (
                   <button key={v} type="button"
                     className={`filter-chip${filterTime === v ? ' active' : ''}`}
                     onClick={() => { setFilterTime(v); setCurrentPage(1); }}>
-                    {v === 'all' ? '全部' : v === 'morning' ? '早（~12時）' : v === 'afternoon' ? '午（12-18時）' : '晚（18時~）'}
+                    {v === 'all' ? t('filterAll') : v === 'morning' ? t('timeMorning') : v === 'afternoon' ? t('timeAfternoon') : t('timeEvening')}
                   </button>
                 ))}
               </div>
@@ -409,14 +408,14 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                   </div>
                   <div className="details">
                     <p><strong>{t('trainNo')}:</strong> {schedule.train_no}
-                      <span className="train-type-badge">{schedule.train_type === 'express' ? '直達' : '站站停'}</span>
+                      <span className="train-type-badge">{schedule.train_type === 'express' ? t('trainExpress') : t('trainLocal')}</span>
                     </p>
                     <p><strong>{t('departureTime')}:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}</p>
                     <p><strong>{t('arrivalTime')}:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}</p>
                     <p><strong>{t('date')}:</strong> {schedule.departure_date}</p>
                     {schedule.available_seats !== null && schedule.available_seats !== undefined && (
                       <p className={`seats-badge ${schedule.available_seats === 0 ? 'no-seats' : schedule.available_seats <= 20 ? 'few-seats' : 'many-seats'}`}>
-                        {schedule.available_seats === 0 ? '✗ 已售完' : `● 剩餘 ${schedule.available_seats} 席`}
+                        {schedule.available_seats === 0 ? t('noSeatsLeft') : t('seatsRemaining', { count: schedule.available_seats })}
                       </p>
                     )}
                   </div>
