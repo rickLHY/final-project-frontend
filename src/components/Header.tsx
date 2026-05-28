@@ -12,8 +12,6 @@ const navItems: { page: AppPage; labelKey: string }[] = [
   { page: 'search', labelKey: 'navBooking' },
   { page: 'orders', labelKey: 'navOrders' },
   { page: 'waitlist', labelKey: 'navWaitlist' },
-  { page: 'non-reserved', labelKey: 'tabNonReserved' },
-  { page: 'peak-sales', labelKey: 'tabHolidaySales' },
 ];
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
