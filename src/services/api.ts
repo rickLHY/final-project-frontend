@@ -269,7 +269,8 @@ class ApiService {
       method: 'PUT',
       headers: this.getHeaders(),
     });
-    return this.handleResponse<Order>(response);
+    await this.handleResponse<unknown>(response); // backend returns single ticket
+    return this.getOrder(orderId);               // fetch full updated order
   }
 
   // ===== Waitlist =====
