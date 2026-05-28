@@ -99,6 +99,12 @@ export function SeatSelection({
     setSelectedSeats(newSelected);
   };
 
+  const deselectSeat = (seatId: number) => {
+    const newSelected = new Map(selectedSeats);
+    newSelected.delete(seatId);
+    setSelectedSeats(newSelected);
+  };
+
   const getStartStation = () =>
     stations.find((s) => s.station_id === startStationId)?.station_name || '';
   const getEndStation = () =>
@@ -196,7 +202,7 @@ export function SeatSelection({
                       isSelected={isSelected}
                       selectedType={selectedSeats.get(seat.seat_id)}
                       onSelect={(ticketType) => toggleSeat(seat.seat_id, ticketType)}
-                      onDeselect={() => selectedSeats.delete(seat.seat_id)}
+                      onDeselect={() => deselectSeat(seat.seat_id)}
                     />
                   );
                 })}

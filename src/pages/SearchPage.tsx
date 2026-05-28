@@ -6,7 +6,13 @@ import apiService from '../services/api';
 import '../styles/SearchPage.css';
 
 interface SearchPageProps {
-  onSelectSchedule: (schedule: Schedule) => void;
+  onSelectSchedule: (schedule: Schedule, selection: SearchSelection) => void;
+}
+
+export interface SearchSelection {
+  startStationId: number;
+  endStationId: number;
+  departureDate: string;
 }
 
 export function SearchPage({ onSelectSchedule }: SearchPageProps) {
@@ -166,7 +172,13 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 </div>
               </div>
               <button
-                onClick={() => onSelectSchedule(schedule)}
+                onClick={() =>
+                  onSelectSchedule(schedule, {
+                    startStationId,
+                    endStationId,
+                    departureDate,
+                  })
+                }
                 className="btn-primary"
               >
                 選擇班次

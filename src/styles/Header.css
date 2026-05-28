@@ -13,6 +13,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
 }
 
 .logo {
@@ -25,6 +26,28 @@
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+.main-nav button {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.main-nav button:hover,
+.main-nav button.active {
+  background-color: white;
+  color: #0d47a1;
 }
 
 .user-info {
@@ -51,4 +74,17 @@
 .auth-prompt {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 760px) {
+  .header-container {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .main-nav,
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }

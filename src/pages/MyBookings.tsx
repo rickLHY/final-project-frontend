@@ -16,9 +16,8 @@ export function MyBookings({ stations }: MyBookingsProps) {
 
   const loadOrders = async () => {
     try {
-      // In a real implementation, we'd fetch from API
-      // For now, this is a placeholder
-      setOrders([]);
+      const data = await apiService.getMyOrders();
+      setOrders(data);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : '載入訂單失敗');
@@ -131,11 +130,11 @@ export function MyBookings({ stations }: MyBookingsProps) {
               <div className="expand-icon">{expandedOrder === order.order_id ? '▼' : '▶'}</div>
             </div>
 
-            {expandedOrder === order.order_id && order.order_tickets && (
+            {expandedOrder === order.order_id && (
               <div className="order-details">
                 <div className="tickets">
                   <h4>車票</h4>
-                  {order.order_tickets.map((ticket) => (
+                  {(order.tickets ?? order.order_tickets ?? []).map((ticket) => (
                     <div key={ticket.ticket_id} className="ticket-detail">
                       <div className="ticket-info">
                         <p>
@@ -162,6 +161,9 @@ export function MyBookings({ stations }: MyBookingsProps) {
                       )}
                     </div>
                   ))}
+                  {(order.tickets ?? order.order_tickets ?? []).length === 0 && (
+                    <p>這筆訂單沒有車票明細。</p>
+                  )}
                 </div>
 
                 {order.payment_status === 'unpaid' && (
