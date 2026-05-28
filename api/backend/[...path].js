@@ -1,6 +1,6 @@
 const DEFAULT_BACKEND_TARGET = 'https://courier-relive-rival.ngrok-free.dev'
 
-export default async function handler(request, response) {
+module.exports = async function handler(request, response) {
   const target = process.env.BACKEND_TARGET || DEFAULT_BACKEND_TARGET
   const pathParts = Array.isArray(request.query.path)
     ? request.query.path
@@ -16,18 +16,17 @@ export default async function handler(request, response) {
     }
   }
 
-  const headers = new Headers()
+  const headers = {}
   for (const [key, value] of Object.entries(request.headers)) {
     if (!value || ['host', 'content-length'].includes(key.toLowerCase())) continue
-    headers.set(key, Array.isArray(value) ? value.join(',') : value)
+    headers[key] = Array.isArray(value) ? value.join(',') : value
   }
-  // Required for ngrok free tier — prevents the browser-warning HTML page
-  headers.set('ngrok-skip-browser-warning', 'true')
+  headers['ngrok-skip-browser-warning'] = 'true'
 
-  const proxiedResponse = await fetch(url, {
+  const proxiedResponse = await fetch(url.toString(), {
     method: request.method,
     headers,
-    body: ['GET', 'HEAD'].includes(request.method ?? '') ? undefined : request,
+    body: ['GET', 'HEAD'].includes(request.method || '') ? undefined : request,
     duplex: 'half',
   })
 
