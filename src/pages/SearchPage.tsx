@@ -1,14 +1,15 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
-import type { Station, Schedule } from '../types';
+import type { Station, Schedule, NonReservedAvailability, PeakSalesSummary } from '../types';
 import apiService from '../services/api';
 import { useI18n } from '../i18n';
 import '../styles/SearchPage.css';
 
+type QueryTab = 'timetable' | 'booking' | 'non-reserved' | 'peak-sales';
+
 interface SearchPageProps {
   onSelectSchedule: (schedule: Schedule, selection: SearchSelection) => void;
-  onNavigate?: (page: import('../App').AppPage) => void;
 }
 
 export interface SearchSelection {
@@ -17,7 +18,23 @@ export interface SearchSelection {
   departureDate: string;
 }
 
-export function SearchPage({ onSelectSchedule, onNavigate }: SearchPageProps) {
+const LEVEL_LABEL: Record<string, string> = { low: '順暢', medium: '稍擁擠', high: '擁擠', full: '滿載' };
+const LEVEL_CLASS: Record<string, string> = { low: 'congestion-low', medium: 'congestion-medium', high: 'congestion-high', full: 'congestion-full' };
+
+function OccupancyBar({ rate }: { rate: number }) {
+  const color = rate >= 90 ? '#e53935' : rate >= 60 ? '#fb8c00' : '#43a047';
+  return (
+    <div className="occupancy-bar-wrap">
+      <div className="occupancy-bar-bg">
+        <div className="occupancy-bar-fill" style={{ width: `${Math.min(rate, 100)}%`, background: color }} />
+      </div>
+      <span className="occupancy-label">{rate.toFixed(1)}%</span>
+    </div>
+  );
+}
+
+export function SearchPage({ onSelectSchedule }: SearchPageProps) {
+  const [activeTab, setActiveTab] = useState<QueryTab>('timetable');
   const [stations, setStations] = useState<Station[]>([]);
   const [startStationId, setStartStationId] = useState<number>(0);
   const [endStationId, setEndStationId] = useState<number>(0);
@@ -32,6 +49,22 @@ export function SearchPage({ onSelectSchedule, onNavigate }: SearchPageProps) {
   const [filterTime, setFilterTime] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
   const PAGE_SIZE = 8;
   const { t } = useI18n();
+
+  // ── Non-reserved tab state ──────────────────────────────────────────────────
+  const today = new Date().toISOString().slice(0, 10);
+  const [nrDate, setNrDate] = useState(today);
+  const [nrStationId, setNrStationId] = useState('');
+  const [nrResults, setNrResults] = useState<NonReservedAvailability[] | null>(null);
+  const [nrLoading, setNrLoading] = useState(false);
+  const [nrError, setNrError] = useState<string | null>(null);
+
+  // ── Peak sales tab state ────────────────────────────────────────────────────
+  const sevenDaysLater = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const [psStart, setPsStart] = useState(today);
+  const [psEnd, setPsEnd] = useState(sevenDaysLater);
+  const [psResults, setPsResults] = useState<PeakSalesSummary[] | null>(null);
+  const [psLoading, setPsLoading] = useState(false);
+  const [psError, setPsError] = useState<string | null>(null);
 
   const loadStations = async () => {
     try {
@@ -84,6 +117,23 @@ export function SearchPage({ onSelectSchedule, onNavigate }: SearchPageProps) {
     }
   };
 
+  const handleNrSearch = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!nrStationId) return;
+    setNrError(null); setNrLoading(true);
+    try { setNrResults(await apiService.getNonReservedAvailability(nrDate, Number(nrStationId))); }
+    catch (err) { setNrError(err instanceof Error ? err.message : '查詢失敗'); }
+    finally { setNrLoading(false); }
+  };
+
+  const handlePsSearch = async (e: FormEvent) => {
+    e.preventDefault();
+    setPsError(null); setPsLoading(true);
+    try { setPsResults(await apiService.getPeakSales(psStart, psEnd)); }
+    catch (err) { setPsError(err instanceof Error ? err.message : '查詢失敗'); }
+    finally { setPsLoading(false); }
+  };
+
   const getTomorrow = () => {
     const date = new Date();
     date.setDate(date.getDate() + 1);
@@ -111,12 +161,99 @@ export function SearchPage({ onSelectSchedule, onNavigate }: SearchPageProps) {
 
       <div className="search-card">
         <div className="query-tabs" aria-label="查詢類型">
-          <button type="button" className="active">{t('tabTimetableFare')}</button>
-          <button type="button" onClick={() => onNavigate?.('search')}>{t('tabOnlineBooking')}</button>
-          <button type="button" onClick={() => onNavigate?.('non-reserved')}>{t('tabNonReserved')}</button>
-          <button type="button" onClick={() => onNavigate?.('peak-sales')}>{t('tabHolidaySales')}</button>
+          {(['timetable', 'booking', 'non-reserved', 'peak-sales'] as QueryTab[]).map((tab, i) => (
+            <button
+              key={tab}
+              type="button"
+              className={activeTab === tab ? 'active' : ''}
+              onClick={() => setActiveTab(tab)}
+            >
+              {t(['tabTimetableFare', 'tabOnlineBooking', 'tabNonReserved', 'tabHolidaySales'][i])}
+            </button>
+          ))}
         </div>
 
+        {/* ── 自由座等候時間 ── */}
+        {activeTab === 'non-reserved' && (
+          <div className="tab-panel">
+            <div className="search-heading"><h3>{t('tabNonReserved')}</h3><p>選擇日期與出發站，查詢各班次自由座剩餘情形。</p></div>
+            <form onSubmit={handleNrSearch} className="search-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>{t('departureDate')}</label>
+                  <input type="date" value={nrDate} min={today} onChange={e => setNrDate(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label>{t('startStation')}</label>
+                  <select value={nrStationId} onChange={e => setNrStationId(e.target.value)} required>
+                    <option value="">請選擇車站</option>
+                    {stations.map(s => <option key={s.station_id} value={s.station_id}>{s.station_name}</option>)}
+                  </select>
+                </div>
+                <button type="submit" className="btn-primary" disabled={nrLoading}>{nrLoading ? t('searching') : t('searchSchedules')}</button>
+              </div>
+            </form>
+            {nrError && <div className="error-message">{nrError}</div>}
+            {nrResults !== null && (nrResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (
+              <table className="data-table">
+                <thead><tr><th>{t('trainNo')}</th><th>車種</th><th>{t('departureTime')}</th><th>自由座總數</th><th>已售出</th><th>剩餘</th><th>壅擠程度</th></tr></thead>
+                <tbody>{nrResults.map(r => (
+                  <tr key={r.schedule_id}>
+                    <td>{r.train_no}</td>
+                    <td>{r.train_type === 'express' ? '自強' : '莒光'}</td>
+                    <td>{r.departure_time?.slice(0, 5) ?? '—'}</td>
+                    <td>{r.non_reserved_total}</td>
+                    <td>{r.non_reserved_sold}</td>
+                    <td>{r.non_reserved_available}</td>
+                    <td><span className={`congestion-badge ${LEVEL_CLASS[r.congestion_level]}`}>{LEVEL_LABEL[r.congestion_level]}</span></td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            ))}
+          </div>
+        )}
+
+        {/* ── 疏運期銷售資訊 ── */}
+        {activeTab === 'peak-sales' && (
+          <div className="tab-panel">
+            <div className="search-heading"><h3>{t('tabHolidaySales')}</h3><p>選擇日期區間，查詢各班次票務銷售狀況。</p></div>
+            <form onSubmit={handlePsSearch} className="search-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>開始日期</label>
+                  <input type="date" value={psStart} min={today} onChange={e => setPsStart(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label>結束日期</label>
+                  <input type="date" value={psEnd} min={psStart} onChange={e => setPsEnd(e.target.value)} required />
+                </div>
+                <button type="submit" className="btn-primary" disabled={psLoading}>{psLoading ? t('searching') : t('searchSchedules')}</button>
+              </div>
+            </form>
+            {psError && <div className="error-message">{psError}</div>}
+            {psResults !== null && (psResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (
+              <table className="data-table">
+                <thead><tr><th>{t('date')}</th><th>{t('trainNo')}</th><th>車種</th><th>首班發車</th><th>末班到達</th><th>總座位</th><th>已售</th><th>剩餘</th><th>售票率</th></tr></thead>
+                <tbody>{psResults.map(r => (
+                  <tr key={r.schedule_id}>
+                    <td>{r.departure_date}</td>
+                    <td>{r.train_no}</td>
+                    <td>{r.train_type === 'express' ? '自強' : '莒光'}</td>
+                    <td>{r.first_departure_time?.slice(0, 5) ?? '—'}</td>
+                    <td>{r.last_arrival_time?.slice(0, 5) ?? '—'}</td>
+                    <td>{r.total_seats}</td>
+                    <td>{r.sold_seats}</td>
+                    <td>{r.available_seats}</td>
+                    <td><OccupancyBar rate={r.occupancy_rate} /></td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            ))}
+          </div>
+        )}
+
+        {/* ── 時刻表與票價 / 網路訂票 ── */}
+        {(activeTab === 'timetable' || activeTab === 'booking') && <>
         <div className="search-heading">
           <h3>{t('trainSearch')}</h3>
           <p>{t('searchHint')}</p>
@@ -217,9 +354,10 @@ export function SearchPage({ onSelectSchedule, onNavigate }: SearchPageProps) {
             {loading ? t('searching') : t('searchSchedules')}
           </button>
         </form>
+        </>}
       </div>
 
-      {schedules.length > 0 && (() => {
+      {(activeTab === 'timetable' || activeTab === 'booking') && schedules.length > 0 && (() => {
         const filtered = schedules.filter((s) => {
           if (filterType !== 'all' && s.train_type !== filterType) return false;
           const h = parseInt(s.origin_departure_time?.slice(0, 2) ?? '12');

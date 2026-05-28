@@ -72,7 +72,7 @@ function App() {
     }
 
     if (page === 'search') {
-      return <SearchPage onSelectSchedule={handleSelectSchedule} onNavigate={setPage} />;
+      return <SearchPage onSelectSchedule={handleSelectSchedule} />;
     }
 
     if (page === 'seats' && selectedSchedule && searchSelection) {
