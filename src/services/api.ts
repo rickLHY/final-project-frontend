@@ -17,7 +17,7 @@ import type {
   SearchParams,
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/backend';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://courier-relive-rival.ngrok-free.dev';
 
 class ApiService {
   private token: string | null = null;
@@ -46,6 +46,7 @@ class ApiService {
   private getHeaders(): RequestInit['headers'] {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     };
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
@@ -87,6 +88,7 @@ class ApiService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'ngrok-skip-browser-warning': 'true',
       },
       body: form,
     });
