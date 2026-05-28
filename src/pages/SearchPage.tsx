@@ -171,13 +171,22 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
             <div className="form-group">
               <label htmlFor="departure-date">{t('departureDate')}</label>
-              <input
-                id="departure-date"
-                type="date"
-                value={departureDate}
-                onChange={(e) => setDepartureDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-              />
+              <div className="date-input-row">
+                <input
+                  id="departure-date"
+                  type="date"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+                <button
+                  type="button"
+                  className="btn-date-shortcut"
+                  onClick={() => setDepartureDate(getTomorrow())}
+                >
+                  {t('tomorrow')}
+                </button>
+              </div>
             </div>
 
             {tripType === 'round-trip' && (
@@ -199,16 +208,6 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
           <button type="submit" disabled={loading} className="btn-primary">
             {loading ? t('searching') : t('searchSchedules')}
           </button>
-
-          <div className="quick-actions">
-            <button
-              type="button"
-              onClick={() => setDepartureDate(getTomorrow())}
-              className="btn-secondary"
-            >
-              {t('tomorrow')}
-            </button>
-          </div>
         </form>
       </div>
 

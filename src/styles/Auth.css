@@ -44,6 +44,23 @@
   min-height: 44px;
 }
 
+.auth-card .btn-secondary.btn-back {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 10px;
+  background: transparent;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-secondary, #555);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.auth-card .btn-secondary.btn-back:hover {
+  background: #f1f3f5;
+}
+
 .auth-toggle {
   text-align: center;
   padding: 16px 0;

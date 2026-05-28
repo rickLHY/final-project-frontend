@@ -101,6 +101,16 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
           <button type="submit" disabled={loading} className="btn-primary">
             {loading ? t('processing') : mode === 'login' ? t('login') : t('register')}
           </button>
+
+          {mode === 'register' && (
+            <button
+              type="button"
+              className="btn-secondary btn-back"
+              onClick={() => { setMode('login'); setError(null); }}
+            >
+              {t('previous')}
+            </button>
+          )}
         </form>
 
         <div className="auth-toggle">

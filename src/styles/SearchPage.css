@@ -205,6 +205,35 @@
   margin-bottom: 6px;
 }
 
+.date-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.date-input-row input[type="date"] {
+  flex: 1;
+}
+
+.btn-date-shortcut {
+  white-space: nowrap;
+  padding: 0 14px;
+  height: 38px;
+  border: 1.5px solid #f47721;
+  border-radius: 6px;
+  background: #fff;
+  color: #f47721;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-date-shortcut:hover {
+  background: #f47721;
+  color: #fff;
+}
+
 .schedules-list {
   padding: 0;
 }
