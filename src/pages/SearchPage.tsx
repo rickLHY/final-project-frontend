@@ -19,7 +19,9 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const [stations, setStations] = useState<Station[]>([]);
   const [startStationId, setStartStationId] = useState<number>(0);
   const [endStationId, setEndStationId] = useState<number>(0);
+  const [tripType, setTripType] = useState<'one-way' | 'round-trip'>('one-way');
   const [departureDate, setDepartureDate] = useState(new Date().toISOString().split('T')[0]);
+  const [returnDate, setReturnDate] = useState(new Date().toISOString().split('T')[0]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,11 +115,21 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
         <form onSubmit={handleSearch} className="search-form">
           <div className="trip-type">
             <label>
-              <input type="radio" checked readOnly />
+              <input
+                type="radio"
+                name="trip-type"
+                checked={tripType === 'one-way'}
+                onChange={() => setTripType('one-way')}
+              />
               單程
             </label>
             <label>
-              <input type="radio" disabled />
+              <input
+                type="radio"
+                name="trip-type"
+                checked={tripType === 'round-trip'}
+                onChange={() => setTripType('round-trip')}
+              />
               去回程
             </label>
           </div>
@@ -165,6 +177,19 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 min={new Date().toISOString().split('T')[0]}
               />
             </div>
+
+            {tripType === 'round-trip' && (
+              <div className="form-group">
+                <label htmlFor="return-date">回程日期</label>
+                <input
+                  id="return-date"
+                  type="date"
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                  min={departureDate}
+                />
+              </div>
+            )}
           </div>
 
           {error && <div className="error-message">{error}</div>}
