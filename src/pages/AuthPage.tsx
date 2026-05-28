@@ -71,6 +71,7 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
           callback: (resp: { credential: string }) => window.__thsrGoogleCb?.(resp),
           auto_select: false,
           cancel_on_tap_outside: true,
+          use_fedcm_for_prompt: false,  // disable FedCM, use legacy popup
         });
         setGoogleReady(true);
       } catch (e) {
