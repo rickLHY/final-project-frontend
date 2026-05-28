@@ -21,6 +21,8 @@ export default async function handler(request, response) {
     if (!value || ['host', 'content-length'].includes(key.toLowerCase())) continue
     headers.set(key, Array.isArray(value) ? value.join(',') : value)
   }
+  // Required for ngrok free tier — prevents the browser-warning HTML page
+  headers.set('ngrok-skip-browser-warning', 'true')
 
   const proxiedResponse = await fetch(url, {
     method: request.method,

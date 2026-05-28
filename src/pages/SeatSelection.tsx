@@ -185,7 +185,7 @@ export function SeatSelection({
               {seatsByCarriage[carriageNo]
                 .sort((a, b) => (a.row_no !== b.row_no ? a.row_no - b.row_no : a.seat_letter.localeCompare(b.seat_letter)))
                 .map((seat) => {
-                  const isAvailable = availableSeats.some((as) => as.seat_id === seat.seat_id && as.is_available);
+                  const isAvailable = availableSeats.some((as) => as.seat_id === seat.seat_id);
                   const isSelected = selectedSeats.has(seat.seat_id);
 
                   return (

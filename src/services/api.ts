@@ -195,10 +195,21 @@ class ApiService {
 
   // ===== Orders =====
   async createOrder(data: CreateOrderRequest): Promise<Order> {
+    const ticketTypeMap: Record<string, string> = {
+      'full': '全票',
+      'early-bird': '早鳥',
+      'student': '大學生',
+      'elderly': '敬老',
+      'companion': '愛心',
+      'friend': '愛陪',
+      'child': '兒童',
+    };
+
     const payload = {
       ...data,
       tickets: data.tickets.map(({ companion_ticket_id, ...ticket }) => ({
         ...ticket,
+        ticket_type: ticketTypeMap[ticket.ticket_type] ?? ticket.ticket_type,
         companion_idx: ticket.companion_idx ?? companion_ticket_id ?? null,
       })),
     };

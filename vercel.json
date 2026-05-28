@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/backend/:path*",
-      "destination": "https://courier-relive-rival.ngrok-free.dev/:path*"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
