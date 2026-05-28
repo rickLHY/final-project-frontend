@@ -5,15 +5,19 @@
 }
 
 :root {
-  --primary-color: #1976d2;
-  --secondary-color: #0d47a1;
-  --success-color: #388e3c;
-  --danger-color: #d32f2f;
-  --warning-color: #f57c00;
-  --text-color: #333;
-  --border-color: #ddd;
-  --background-color: #f5f5f5;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --primary-color: #8f1d2c;
+  --secondary-color: #64131f;
+  --accent-color: #b98a48;
+  --success-color: #2f7d4f;
+  --danger-color: #b3261e;
+  --warning-color: #a66300;
+  --text-color: #2d2a26;
+  --muted-color: #6b625a;
+  --border-color: #d8d1c8;
+  --background-color: #f4f1ec;
+  --surface-color: #fffdf9;
+  --table-head: #efe8df;
+  --shadow: 0 10px 30px rgba(52, 38, 30, 0.10);
 }
 
 body {
@@ -24,12 +28,22 @@ body {
   background-color: var(--background-color);
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(120deg, rgba(143, 29, 44, 0.08), transparent 34%),
+    repeating-linear-gradient(90deg, rgba(143, 29, 44, 0.035) 0 1px, transparent 1px 90px);
+}
+
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: 3px;
+  padding: 9px 18px;
   font-size: 14px;
   transition: all 0.3s ease;
 }
@@ -43,6 +57,7 @@ button:disabled {
   background-color: var(--primary-color);
   color: white;
   font-weight: 600;
+  border-bottom: 3px solid var(--secondary-color);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -51,7 +66,7 @@ button:disabled {
 }
 
 .btn-secondary {
-  background-color: #999;
+  background-color: #5f5a54;
   color: white;
   font-weight: 600;
 }
@@ -111,8 +126,8 @@ select,
 textarea {
   font-family: inherit;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 8px 12px;
+  border-radius: 2px;
+  padding: 10px 12px;
   font-size: 14px;
   color: var(--text-color);
 }
@@ -130,7 +145,7 @@ textarea:focus {
   border: 1px solid var(--danger-color);
   color: var(--danger-color);
   padding: 12px;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 16px;
   font-weight: 500;
 }
@@ -140,7 +155,7 @@ textarea:focus {
   border: 1px solid var(--success-color);
   color: var(--success-color);
   padding: 12px;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 16px;
   font-weight: 500;
 }
@@ -150,7 +165,7 @@ textarea:focus {
   border: 1px solid var(--warning-color);
   color: var(--warning-color);
   padding: 12px;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 16px;
   font-weight: 500;
 }
@@ -182,7 +197,7 @@ textarea:focus {
 .status-badge {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 2px;
   font-size: 12px;
   font-weight: 600;
   margin-left: 8px;
@@ -194,13 +209,13 @@ textarea:focus {
 }
 
 .status-badge.unpaid {
-  background-color: #fff3e0;
+  background-color: #fff3df;
   color: var(--warning-color);
 }
 
 .status-badge.cancelled {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
+  background-color: #eee8e2;
+  color: #6b625a;
 }
 
 .status-badge.matched {

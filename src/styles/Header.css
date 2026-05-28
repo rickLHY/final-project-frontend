@@ -1,90 +1,147 @@
 .header {
-  background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
-  color: white;
-  padding: 16px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  margin-bottom: 24px;
+  background: var(--surface-color);
+  color: var(--text-color);
+  box-shadow: 0 2px 16px rgba(51, 37, 30, 0.12);
+  margin-bottom: 28px;
+  border-top: 4px solid var(--primary-color);
+}
+
+.utility-bar {
+  height: 30px;
+  background: #2f2a26;
+  color: #f5efe8;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  padding: 0 calc((100vw - 1200px) / 2 + 16px);
+  font-size: 12px;
 }
 
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 18px 16px 0;
+  display: grid;
+  grid-template-columns: minmax(280px, auto) 1fr auto;
+  gap: 24px;
+  align-items: end;
+}
+
+.brand-block {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
+  padding-bottom: 16px;
+}
+
+.rail-mark {
+  width: 54px;
+  height: 34px;
+  background:
+    linear-gradient(135deg, transparent 0 26%, var(--primary-color) 27% 54%, transparent 55%),
+    linear-gradient(135deg, transparent 18%, var(--accent-color) 19% 35%, transparent 36%);
+  border-left: 5px solid var(--primary-color);
 }
 
 .logo {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
+  letter-spacing: 0;
+  color: var(--primary-color);
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.brand-block p {
+  margin: 2px 0 0;
+  color: var(--muted-color);
+  font-size: 12px;
+  letter-spacing: 0.8px;
 }
 
 .main-nav {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: auto;
+  align-items: stretch;
+  align-self: stretch;
+  gap: 0;
+  border-left: 1px solid var(--border-color);
 }
 
 .main-nav button {
-  background-color: rgba(255, 255, 255, 0.14);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 7px 12px;
-  font-size: 13px;
+  min-width: 108px;
+  background-color: transparent;
+  color: #3f3832;
+  border-radius: 0;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 4px solid transparent;
+  padding: 20px 18px 16px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .main-nav button:hover,
 .main-nav button.active {
-  background-color: white;
-  color: #0d47a1;
+  background-color: #f6eee6;
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
 }
 
 .user-info {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 700;
+  color: #3f3832;
+  white-space: nowrap;
 }
 
 .btn-logout {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #5f5a54;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 6px 12px;
+  padding: 8px 14px;
   font-size: 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  border-radius: 2px;
 }
 
 .btn-logout:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
+  background-color: var(--primary-color);
 }
 
 .auth-prompt {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted-color);
 }
 
-@media (max-width: 760px) {
-  .header-container {
-    align-items: flex-start;
-    flex-direction: column;
+@media (max-width: 900px) {
+  .utility-bar {
+    justify-content: center;
+    padding: 0 12px;
   }
 
-  .main-nav,
+  .header-container {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 0;
+    padding-top: 14px;
+  }
+
+  .brand-block,
   .header-actions {
-    width: 100%;
-    flex-wrap: wrap;
+    padding-bottom: 12px;
+  }
+
+  .main-nav {
+    border-top: 1px solid var(--border-color);
+    overflow-x: auto;
+  }
+
+  .main-nav button {
+    flex: 1 0 100px;
+    padding: 14px 12px 10px;
   }
 }

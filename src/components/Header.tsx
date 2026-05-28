@@ -18,8 +18,19 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
 
   return (
     <header className="header">
+      <div className="utility-bar">
+        <span>會員專區</span>
+        <span>常見問題</span>
+        <span>聯絡我們</span>
+      </div>
       <div className="header-container">
-        <h1 className="logo">台灣高鐵訂票系統</h1>
+        <div className="brand-block">
+          <div className="rail-mark" aria-hidden="true"></div>
+          <div>
+            <h1 className="logo">台灣高鐵訂票系統</h1>
+            <p>Taiwan High Speed Rail Ticketing</p>
+          </div>
+        </div>
         {user && (
           <nav className="main-nav" aria-label="主要功能">
             {navItems.map((item) => (

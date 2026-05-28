@@ -1,15 +1,16 @@
 .booking-confirm-container {
-  max-width: 600px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 24px 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 28px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-top: 5px solid var(--primary-color);
+  box-shadow: var(--shadow);
 }
 
 .booking-confirm-container h2 {
   margin-bottom: 24px;
-  color: #1976d2;
+  color: var(--primary-color);
   text-align: center;
 }
 
@@ -19,16 +20,15 @@
 
 .ticket-list h3 {
   margin-bottom: 12px;
-  color: #333;
+  color: #3f3832;
   font-size: 14px;
 }
 
 .ticket-item {
-  background-color: #f9f9f9;
-  border-left: 4px solid #1976d2;
+  background-color: #fbf8f3;
+  border-left: 5px solid var(--accent-color);
   padding: 12px;
   margin-bottom: 8px;
-  border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -36,7 +36,7 @@
 
 .ticket-number {
   font-weight: 600;
-  color: #1976d2;
+  color: var(--primary-color);
   min-width: 80px;
 }
 
@@ -48,17 +48,16 @@
 .ticket-details p {
   margin: 2px 0;
   font-size: 13px;
-  color: #666;
+  color: var(--muted-color);
 }
 
 .ticket-details strong {
-  color: #333;
+  color: #3f3832;
 }
 
 .summary {
-  background-color: #f5f5f5;
+  background-color: #f7f2ec;
   padding: 16px;
-  border-radius: 8px;
   margin-bottom: 24px;
 }
 
@@ -67,22 +66,22 @@
   justify-content: space-between;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #666;
+  color: var(--muted-color);
 }
 
 .summary-row.total {
-  border-top: 2px solid #ddd;
+  border-top: 2px solid var(--border-color);
   padding-top: 8px;
   margin-top: 8px;
   font-size: 18px;
   font-weight: 700;
-  color: #1976d2;
+  color: var(--primary-color);
 }
 
 .terms {
   padding: 16px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
+  background-color: #f7f2ec;
+  border: 1px solid var(--border-color);
   margin-bottom: 24px;
 }
 
@@ -91,7 +90,7 @@
   align-items: center;
   cursor: pointer;
   font-size: 13px;
-  color: #666;
+  color: var(--muted-color);
 }
 
 .terms input[type='checkbox'] {

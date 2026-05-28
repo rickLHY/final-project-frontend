@@ -128,7 +128,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
                 <strong>轉帳金額: NT$ {order.total_amount.toLocaleString()}</strong>
               </p>
               <p className="warning">
-                ⚠️ 請於 30 分鐘內完成轉帳，否則訂單將自動取消
+                請於 30 分鐘內完成轉帳，否則訂單將自動取消
               </p>
             </div>
           )}
@@ -144,7 +144,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
         </form>
 
         <div className="test-info">
-          <p>💡 <strong>測試提示:</strong> 點擊「完成付款」即可完成模擬付款</p>
+          <p><strong>測試提示:</strong> 點擊「完成付款」即可完成模擬付款</p>
         </div>
       </div>
     </div>

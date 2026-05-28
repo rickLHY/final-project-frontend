@@ -6,7 +6,9 @@
 
 .waitlist-page h2 {
   margin-bottom: 24px;
-  color: #1976d2;
+  color: var(--primary-color);
+  border-left: 5px solid var(--primary-color);
+  padding-left: 12px;
 }
 
 .waitlist-items {
@@ -15,9 +17,10 @@
 }
 
 .waitlist-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid var(--accent-color);
+  box-shadow: var(--shadow);
   padding: 16px;
   display: flex;
   justify-content: space-between;
@@ -39,11 +42,11 @@
 }
 
 .station {
-  color: #1976d2;
+  color: var(--primary-color);
 }
 
 .arrow {
-  color: #999;
+  color: var(--accent-color);
   font-size: 14px;
 }
 
@@ -55,18 +58,17 @@
 .details p {
   margin: 0;
   font-size: 13px;
-  color: #666;
+  color: var(--muted-color);
 }
 
 .details strong {
-  color: #333;
+  color: #3f3832;
 }
 
 .btn-cancel {
-  background-color: #999;
+  background-color: #5f5a54;
   color: white;
   padding: 8px 16px;
-  border-radius: 4px;
   font-size: 13px;
   cursor: pointer;
   border: none;

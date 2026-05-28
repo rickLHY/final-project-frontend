@@ -84,10 +84,44 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
   return (
     <div className="search-page">
+      <section className="service-hero">
+        <div>
+          <p className="hero-kicker">快速查詢</p>
+          <h2>預訂高鐵車票</h2>
+          <p>查詢班次、確認票價並進入線上訂位流程。</p>
+        </div>
+        <div className="train-line" aria-hidden="true">
+          <span>南港</span>
+          <span>台中</span>
+          <span>左營</span>
+        </div>
+      </section>
+
       <div className="search-card">
-        <h2>搜尋班次</h2>
+        <div className="query-tabs" aria-label="查詢類型">
+          <button type="button" className="active">時刻表與票價</button>
+          <button type="button">網路訂票</button>
+          <button type="button">自由座等候時間</button>
+          <button type="button">疏運期銷售資訊</button>
+        </div>
+
+        <div className="search-heading">
+          <h3>車次查詢</h3>
+          <p>請選擇出發站、抵達站與乘車日期。</p>
+        </div>
 
         <form onSubmit={handleSearch} className="search-form">
+          <div className="trip-type">
+            <label>
+              <input type="radio" checked readOnly />
+              單程
+            </label>
+            <label>
+              <input type="radio" disabled />
+              去回程
+            </label>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="start-station">出發站</label>
@@ -153,7 +187,10 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
       {schedules.length > 0 && (
         <div className="schedules-list">
-          <h3>搜尋結果 ({schedules.length} 班次)</h3>
+          <div className="result-title">
+            <h3>搜尋結果</h3>
+            <span>{schedules.length} 班次</span>
+          </div>
           {schedules.map((schedule) => (
             <div key={schedule.schedule_id} className="schedule-card">
               <div className="schedule-info">
@@ -165,6 +202,12 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 <div className="details">
                   <p>
                     <strong>車次:</strong> {schedule.train_no}
+                  </p>
+                  <p>
+                    <strong>發車:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}
+                  </p>
+                  <p>
+                    <strong>抵達:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}
                   </p>
                   <p>
                     <strong>日期:</strong> {schedule.departure_date}
