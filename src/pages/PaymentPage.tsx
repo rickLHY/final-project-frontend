@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Order } from '../types';
 import apiService from '../services/api';
+import { useI18n } from '../i18n';
 import '../styles/Payment.css';
 
 interface PaymentPageProps {
@@ -17,6 +18,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCVV, setCardCVV] = useState('');
+  const { t } = useI18n();
 
   const handlePayment = async (e: FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
       const updatedOrder = await apiService.payOrder(order.order_id);
       onPaymentSuccess(updatedOrder);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '付款失敗');
+      setError(err instanceof Error ? err.message : t('paymentFailed'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -39,15 +41,15 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
   return (
     <div className="payment-container">
       <div className="payment-card">
-        <h2>付款</h2>
+        <h2>{t('payment')}</h2>
 
         <div className="order-summary">
           <div className="summary-item">
-            <span>訂單編號:</span>
+            <span>{t('bookingCode')}:</span>
             <strong>{order.booking_code}</strong>
           </div>
           <div className="summary-item">
-            <span>應付金額:</span>
+            <span>{t('payableAmount')}:</span>
             <strong>NT$ {order.total_amount.toLocaleString()}</strong>
           </div>
         </div>
@@ -56,7 +58,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
 
         <form onSubmit={handlePayment}>
           <div className="payment-method">
-            <h3>選擇付款方式</h3>
+            <h3>{t('paymentMethod')}</h3>
             <label>
               <input
                 type="radio"
@@ -64,7 +66,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
                 checked={paymentMethod === 'credit_card'}
                 onChange={(e) => setPaymentMethod(e.target.value as 'credit_card' | 'atm')}
               />
-              信用卡
+              {t('creditCard')}
             </label>
             <label>
               <input
@@ -73,14 +75,14 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
                 checked={paymentMethod === 'atm'}
                 onChange={(e) => setPaymentMethod(e.target.value as 'credit_card' | 'atm')}
               />
-              ATM 轉帳
+              {t('atm')}
             </label>
           </div>
 
           {paymentMethod === 'credit_card' && (
             <div className="credit-card-form">
               <div className="form-group">
-                <label htmlFor="card-number">卡號 (演示用)</label>
+                <label htmlFor="card-number">{t('cardNumber')}</label>
                 <input
                   id="card-number"
                   type="text"
@@ -92,7 +94,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="card-expiry">有效期限</label>
+                  <label htmlFor="card-expiry">{t('cardExpiry')}</label>
                   <input
                     id="card-expiry"
                     type="text"
@@ -103,7 +105,7 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="card-cvv">CVV</label>
+                  <label htmlFor="card-cvv">{t('cardCvv')}</label>
                   <input
                     id="card-cvv"
                     type="text"
@@ -119,32 +121,32 @@ export function PaymentPage({ order, onPaymentSuccess, onBack }: PaymentPageProp
           {paymentMethod === 'atm' && (
             <div className="atm-info">
               <p>
-                <strong>轉帳帳號:</strong>
+                <strong>{t('transferAccount')}</strong>
               </p>
-              <p>銀行代號: 700</p>
-              <p>帳號: 0123456789</p>
-              <p>戶名: 台灣高鐵股份有限公司</p>
+              <p>{t('bankCode')}</p>
+              <p>{t('accountNumber')}</p>
+              <p>{t('accountName')}</p>
               <p>
-                <strong>轉帳金額: NT$ {order.total_amount.toLocaleString()}</strong>
+                <strong>{t('payableAmount')}: NT$ {order.total_amount.toLocaleString()}</strong>
               </p>
               <p className="warning">
-                請於 30 分鐘內完成轉帳，否則訂單將自動取消
+                {t('transferWarning')}
               </p>
             </div>
           )}
 
           <div className="actions">
             <button type="button" onClick={onBack} className="btn-secondary" disabled={loading}>
-              取消
+              {t('cancel')}
             </button>
             <button type="submit" disabled={loading} className="btn-primary">
-              {loading ? '處理中...' : '完成付款'}
+              {loading ? t('processing') : t('completePayment')}
             </button>
           </div>
         </form>
 
         <div className="test-info">
-          <p><strong>測試提示:</strong> 點擊「完成付款」即可完成模擬付款</p>
+          <p>{t('paymentHint')}</p>
         </div>
       </div>
     </div>

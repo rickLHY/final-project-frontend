@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import type { Station, Schedule } from '../types';
 import apiService from '../services/api';
+import { useI18n } from '../i18n';
 import '../styles/SearchPage.css';
 
 interface SearchPageProps {
@@ -25,6 +26,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
 
   const loadStations = async () => {
     try {
@@ -36,7 +38,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
         setEndStationId(data[data.length - 1].station_id);
       }
     } catch (err) {
-      setError('載入車站資料失敗');
+      setError(t('loadStationsFailed'));
       console.error(err);
     }
   };
@@ -53,7 +55,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
     try {
       if (!startStationId || !endStationId || startStationId === endStationId) {
-        throw new Error('請選擇不同的起訖站');
+        throw new Error(t('chooseDifferentStations'));
       }
 
       const data = await apiService.searchSchedules({
@@ -64,10 +66,10 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
       setSchedules(data);
       if (data.length === 0) {
-        setError('無符合的班次');
+        setError(t('noSchedules'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '搜尋失敗');
+      setError(err instanceof Error ? err.message : t('searchFailed'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -88,28 +90,28 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
     <div className="search-page">
       <section className="service-hero">
         <div>
-          <p className="hero-kicker">快速查詢</p>
-          <h2>預訂高鐵車票</h2>
-          <p>查詢班次、確認票價並進入線上訂位流程。</p>
+          <p className="hero-kicker">{t('quickSearch')}</p>
+          <h2>{t('bookTickets')}</h2>
+          <p>{t('searchIntro')}</p>
         </div>
         <div className="train-line" aria-hidden="true">
-          <span>南港</span>
-          <span>台中</span>
-          <span>左營</span>
+          <span>{t('stationNangang')}</span>
+          <span>{t('stationTaichung')}</span>
+          <span>{t('stationZuoying')}</span>
         </div>
       </section>
 
       <div className="search-card">
         <div className="query-tabs" aria-label="查詢類型">
-          <button type="button" className="active">時刻表與票價</button>
-          <button type="button">網路訂票</button>
-          <button type="button">自由座等候時間</button>
-          <button type="button">疏運期銷售資訊</button>
+          <button type="button" className="active">{t('tabTimetableFare')}</button>
+          <button type="button">{t('tabOnlineBooking')}</button>
+          <button type="button">{t('tabNonReserved')}</button>
+          <button type="button">{t('tabHolidaySales')}</button>
         </div>
 
         <div className="search-heading">
-          <h3>車次查詢</h3>
-          <p>請選擇出發站、抵達站與乘車日期。</p>
+          <h3>{t('trainSearch')}</h3>
+          <p>{t('searchHint')}</p>
         </div>
 
         <form onSubmit={handleSearch} className="search-form">
@@ -121,7 +123,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 checked={tripType === 'one-way'}
                 onChange={() => setTripType('one-way')}
               />
-              單程
+              {t('oneWay')}
             </label>
             <label>
               <input
@@ -130,19 +132,19 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 checked={tripType === 'round-trip'}
                 onChange={() => setTripType('round-trip')}
               />
-              去回程
+              {t('roundTrip')}
             </label>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="start-station">出發站</label>
+              <label htmlFor="start-station">{t('startStation')}</label>
               <select
                 id="start-station"
                 value={startStationId}
                 onChange={(e) => setStartStationId(Number(e.target.value))}
               >
-                <option value="">選擇出發站</option>
+                <option value="">{t('selectStartStation')}</option>
                 {stations.map((station) => (
                   <option key={station.station_id} value={station.station_id}>
                     {station.station_name}
@@ -152,13 +154,13 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="end-station">抵達站</label>
+              <label htmlFor="end-station">{t('endStation')}</label>
               <select
                 id="end-station"
                 value={endStationId}
                 onChange={(e) => setEndStationId(Number(e.target.value))}
               >
-                <option value="">選擇抵達站</option>
+                <option value="">{t('selectEndStation')}</option>
                 {stations.map((station) => (
                   <option key={station.station_id} value={station.station_id}>
                     {station.station_name}
@@ -168,7 +170,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="departure-date">出發日期</label>
+              <label htmlFor="departure-date">{t('departureDate')}</label>
               <input
                 id="departure-date"
                 type="date"
@@ -180,7 +182,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
 
             {tripType === 'round-trip' && (
               <div className="form-group">
-                <label htmlFor="return-date">回程日期</label>
+                <label htmlFor="return-date">{t('returnDate')}</label>
                 <input
                   id="return-date"
                   type="date"
@@ -195,7 +197,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? '搜尋中...' : '搜尋班次'}
+            {loading ? t('searching') : t('searchSchedules')}
           </button>
 
           <div className="quick-actions">
@@ -204,7 +206,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
               onClick={() => setDepartureDate(getTomorrow())}
               className="btn-secondary"
             >
-              明天
+              {t('tomorrow')}
             </button>
           </div>
         </form>
@@ -213,8 +215,8 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
       {schedules.length > 0 && (
         <div className="schedules-list">
           <div className="result-title">
-            <h3>搜尋結果</h3>
-            <span>{schedules.length} 班次</span>
+            <h3>{t('resultTitle')}</h3>
+            <span>{t('trainsCount', { count: schedules.length })}</span>
           </div>
           {schedules.map((schedule) => (
             <div key={schedule.schedule_id} className="schedule-card">
@@ -226,16 +228,16 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 </div>
                 <div className="details">
                   <p>
-                    <strong>車次:</strong> {schedule.train_no}
+                    <strong>{t('trainNo')}:</strong> {schedule.train_no}
                   </p>
                   <p>
-                    <strong>發車:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}
+                    <strong>{t('departureTime')}:</strong> {schedule.origin_departure_time?.slice(0, 5) || '--:--'}
                   </p>
                   <p>
-                    <strong>抵達:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}
+                    <strong>{t('arrivalTime')}:</strong> {schedule.destination_arrival_time?.slice(0, 5) || '--:--'}
                   </p>
                   <p>
-                    <strong>日期:</strong> {schedule.departure_date}
+                    <strong>{t('date')}:</strong> {schedule.departure_date}
                   </p>
                 </div>
               </div>
@@ -249,7 +251,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
                 }
                 className="btn-primary"
               >
-                選擇班次
+                {t('selectSchedule')}
               </button>
             </div>
           ))}

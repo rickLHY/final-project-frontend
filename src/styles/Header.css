@@ -18,6 +18,18 @@
   font-size: 12px;
 }
 
+.utility-bar button {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: 12px;
+}
+
+.utility-bar button.active,
+.utility-bar button:hover {
+  color: var(--accent-color);
+}
+
 .header-container {
   max-width: 1200px;
   margin: 0 auto;

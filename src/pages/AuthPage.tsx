@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useI18n } from '../i18n';
 import '../styles/Auth.css';
 
 interface AuthPageProps {
@@ -16,6 +17,7 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { login, register } = useAuth();
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
       }
       onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : '操作失敗');
+      setError(err instanceof Error ? err.message : t('authFailed'));
     } finally {
       setLoading(false);
     }
@@ -39,13 +41,13 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>{mode === 'login' ? '登入' : '註冊'}</h2>
+        <h2>{mode === 'login' ? t('login') : t('register')}</h2>
 
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">電子信箱</label>
+            <label htmlFor="email">{t('email')}</label>
             <input
               id="email"
               type="email"
@@ -57,63 +59,63 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">密碼</label>
+            <label htmlFor="password">{t('password')}</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="至少 8 個字元"
+              placeholder={t('passwordPlaceholder')}
             />
           </div>
 
           {mode === 'register' && (
             <>
               <div className="form-group">
-                <label htmlFor="name">姓名</label>
+                <label htmlFor="name">{t('name')}</label>
                 <input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="請輸入姓名"
+                  placeholder={t('namePlaceholder')}
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="phone">電話</label>
+                <label htmlFor="phone">{t('phone')}</label>
                 <input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  placeholder="例：0912345678"
+                  placeholder={t('phonePlaceholder')}
                 />
               </div>
             </>
           )}
 
           <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? '處理中...' : mode === 'login' ? '登入' : '註冊'}
+            {loading ? t('processing') : mode === 'login' ? t('login') : t('register')}
           </button>
         </form>
 
         <div className="auth-toggle">
           {mode === 'login' ? (
             <>
-              沒有帳號？{' '}
+              {t('noAccount')}{' '}
               <button type="button" onClick={() => setMode('register')} className="link-button">
-                註冊
+                {t('register')}
               </button>
             </>
           ) : (
             <>
-              已有帳號？{' '}
+              {t('hasAccount')}{' '}
               <button type="button" onClick={() => setMode('login')} className="link-button">
-                登入
+                {t('login')}
               </button>
             </>
           )}
@@ -121,12 +123,12 @@ export function AuthPage({ initialMode = 'login', onSuccess }: AuthPageProps) {
 
         {/* Demo accounts */}
         <div className="demo-accounts">
-          <p>測試帳號:</p>
+          <p>{t('demoAccounts')}</p>
           <p>
-            <strong>管理員:</strong> admin@thsr.com / admin1234
+            <strong>{t('admin')}:</strong> admin@thsr.com / admin1234
           </p>
           <p>
-            <strong>一般用戶:</strong> user@thsr.com / user1234
+            <strong>{t('generalUser')}:</strong> user@thsr.com / user1234
           </p>
         </div>
       </div>

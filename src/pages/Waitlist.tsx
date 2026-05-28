@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import type { Waitlist, Station } from '../types';
 import apiService from '../services/api';
+import { useI18n } from '../i18n';
 import '../styles/Waitlist.css';
 
 interface WaitlistPageProps {
@@ -12,6 +13,7 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
   const [waitlists, setWaitlists] = useState<Waitlist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { locale, t } = useI18n();
 
   const loadWaitlists = async () => {
     try {
@@ -19,7 +21,7 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
       setWaitlists(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '載入候補清單失敗');
+      setError(err instanceof Error ? err.message : t('loadWaitlistFailed'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -31,13 +33,13 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
   }, []);
 
   const handleCancel = async (waitlistId: number) => {
-    if (!window.confirm('確認取消候補？')) return;
+    if (!window.confirm(t('confirmCancelWaitlist'))) return;
 
     try {
       await apiService.cancelWaitlist(waitlistId);
       setWaitlists(waitlists.filter((w) => w.waitlist_id !== waitlistId));
     } catch (err) {
-      alert(err instanceof Error ? err.message : '取消候補失敗');
+      alert(err instanceof Error ? err.message : t('cancelWaitlistFailed'));
     }
   };
 
@@ -46,34 +48,23 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
   };
 
   const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      waiting: '候補中',
-      matched: '已媒合',
-      expired: '已過期',
-      cancelled: '已取消',
-    };
-    return labels[status] || status;
+    return t(status) || status;
   };
 
   const getSeatTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      standard: '標準車廂',
-      business: '商務車廂',
-      any: '不限',
-    };
-    return labels[type] || type;
+    return t(type) || type;
   };
 
   if (loading) {
-    return <div className="loading">載入中...</div>;
+    return <div className="loading">{t('loading')}</div>;
   }
 
   if (waitlists.length === 0) {
     return (
       <div className="waitlist-page">
-        <h2>候補清單</h2>
+        <h2>{t('waitlist')}</h2>
         <div className="empty-state">
-          <p>尚無候補資料</p>
+          <p>{t('emptyWaitlist')}</p>
         </div>
       </div>
     );
@@ -81,7 +72,7 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
 
   return (
     <div className="waitlist-page">
-      <h2>候補清單</h2>
+      <h2>{t('waitlist')}</h2>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -96,16 +87,16 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
               </div>
               <div className="details">
                 <p>
-                  <strong>狀態:</strong>
+                  <strong>{t('status')}:</strong>
                   <span className={`status-badge ${waitlist.status}`}>
                     {getStatusLabel(waitlist.status)}
                   </span>
                 </p>
                 <p>
-                  <strong>偏好車廂:</strong> {getSeatTypeLabel(waitlist.preferred_seat_type)}
+                  <strong>{t('preferredSeat')}:</strong> {getSeatTypeLabel(waitlist.preferred_seat_type)}
                 </p>
                 <p>
-                  <strong>登記時間:</strong> {new Date(waitlist.created_at).toLocaleString('zh-TW')}
+                  <strong>{t('createdAt')}:</strong> {new Date(waitlist.created_at).toLocaleString(locale)}
                 </p>
               </div>
             </div>
@@ -114,7 +105,7 @@ export function WaitlistPage({ stations }: WaitlistPageProps) {
                 onClick={() => handleCancel(waitlist.waitlist_id)}
                 className="btn-cancel"
               >
-                取消候補
+                {t('cancelWaitlist')}
               </button>
             )}
           </div>

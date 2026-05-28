@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import type { MouseEvent } from 'react';
 import type { Schedule, Station, Seat, AvailableSeat, TicketPrice, TicketType } from '../types';
 import apiService from '../services/api';
+import { useI18n } from '../i18n';
 import '../styles/SeatSelection.css';
 
 interface SeatSelectionProps {
@@ -36,6 +37,7 @@ export function SeatSelection({
   const [ticketPrices, setTicketPrices] = useState<TicketPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
 
   const loadData = async () => {
     try {
@@ -51,7 +53,7 @@ export function SeatSelection({
       setTicketPrices(prices);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '載入座位資訊失敗');
+      setError(err instanceof Error ? err.message : t('searchFailed'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -91,7 +93,7 @@ export function SeatSelection({
       newSelected.delete(seatId);
     } else {
       if (newSelected.size >= 6) {
-        alert('最多只能選擇 6 張車票');
+        alert(t('confirmPurchase', { count: 6 }));
         return;
       }
       newSelected.set(seatId, ticketType);
@@ -112,7 +114,7 @@ export function SeatSelection({
 
   const handleConfirm = () => {
     if (selectedSeats.size === 0) {
-      alert('請選擇至少一張座位');
+      alert(t('chooseSeats'));
       return;
     }
 
@@ -134,7 +136,7 @@ export function SeatSelection({
   };
 
   if (loading) {
-    return <div className="loading">載入中...</div>;
+    return <div className="loading">{t('loading')}</div>;
   }
 
   // Group seats by carriage
@@ -160,7 +162,7 @@ export function SeatSelection({
   return (
     <div className="seat-selection-container">
       <div className="header-info">
-        <h2>選擇座位</h2>
+        <h2>{t('chooseSeats')}</h2>
         <div className="route-info">
           <span>{getStartStation()}</span>
           <span>→</span>
@@ -174,19 +176,19 @@ export function SeatSelection({
       <div className="seat-selection">
         <div className="legend">
           <div>
-            <span className="seat-available">O</span> 可購票
+            <span className="seat-available">O</span> {t('available')}
           </div>
           <div>
-            <span className="seat-occupied">X</span> 已售出
+            <span className="seat-occupied">X</span> {t('occupied')}
           </div>
           <div>
-            <span className="seat-selected">✓</span> 已選擇
+            <span className="seat-selected">✓</span> {t('selected')}
           </div>
         </div>
 
         {sortedCarriages.map((carriageNo) => (
           <div key={carriageNo} className="carriage">
-            <h4>第 {carriageNo} 節車廂</h4>
+            <h4>{t('carriage', { no: carriageNo })}</h4>
             <div className="seats-grid">
               {seatsByCarriage[carriageNo]
                 .sort((a, b) => (a.row_no !== b.row_no ? a.row_no - b.row_no : a.seat_letter.localeCompare(b.seat_letter)))
@@ -213,19 +215,19 @@ export function SeatSelection({
 
       <div className="booking-summary">
         <div className="summary-items">
-          <p>已選擇座位: {selectedSeats.size} 張</p>
-          <p className="total-price">總金額: NT$ {totalPrice.toLocaleString()}</p>
+          <p>{t('selectedSeatCount', { count: selectedSeats.size })}</p>
+          <p className="total-price">{t('totalAmount')}: NT$ {totalPrice.toLocaleString()}</p>
         </div>
         <div className="actions">
           <button onClick={onBack} className="btn-secondary">
-            返回
+            {t('back')}
           </button>
           <button
             onClick={handleConfirm}
             disabled={selectedSeats.size === 0}
             className="btn-primary"
           >
-            確認購票 ({selectedSeats.size} 張)
+            {t('confirmPurchase', { count: selectedSeats.size })}
           </button>
         </div>
       </div>
@@ -244,6 +246,7 @@ interface SeatButtonProps {
 
 function SeatButton({ seat, isAvailable, isSelected, onSelect, onDeselect }: SeatButtonProps) {
   const [showTicketType, setShowTicketType] = useState(false);
+  const { t } = useI18n();
 
   const ticketTypeOptions: TicketType[] = ['full', 'student', 'elderly', 'companion', 'child'];
 
@@ -275,7 +278,7 @@ function SeatButton({ seat, isAvailable, isSelected, onSelect, onDeselect }: Sea
         className={`seat-button ${isAvailable ? 'available' : 'occupied'} ${isSelected ? 'selected' : ''} ${seat.is_business_class ? 'business' : ''}`}
         onClick={handleClick}
         disabled={!isAvailable && !isSelected}
-        title={`${getSeatLabel()}${seat.is_business_class ? ' (商務車廂)' : ''}`}
+        title={`${getSeatLabel()}${seat.is_business_class ? ` (${t('business')})` : ''}`}
       >
         {isSelected ? '✓' : isAvailable ? 'O' : 'X'}
       </button>
@@ -287,24 +290,11 @@ function SeatButton({ seat, isAvailable, isSelected, onSelect, onDeselect }: Sea
               onClick={() => handleSelectType(type)}
               className="ticket-type-option"
             >
-              {getTicketTypeLabel(type)}
+              {t(type)}
             </button>
           ))}
         </div>
       )}
     </div>
   );
-}
-
-function getTicketTypeLabel(type: TicketType): string {
-  const labels: Record<TicketType, string> = {
-    full: '全票',
-    'early-bird': '早鳥',
-    student: '大學生',
-    elderly: '敬老',
-    companion: '愛心',
-    friend: '愛陪',
-    child: '兒童',
-  };
-  return labels[type];
 }

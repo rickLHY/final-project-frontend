@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
+import { useI18n } from '../i18n';
 import type { AppPage } from '../App';
 import '../styles/Header.css';
 
@@ -7,27 +8,34 @@ interface HeaderProps {
   onNavigate: (page: AppPage) => void;
 }
 
-const navItems: { page: AppPage; label: string }[] = [
-  { page: 'search', label: '訂票' },
-  { page: 'orders', label: '我的訂單' },
-  { page: 'waitlist', label: '候補' },
+const navItems: { page: AppPage; labelKey: string }[] = [
+  { page: 'search', labelKey: 'navBooking' },
+  { page: 'orders', labelKey: 'navOrders' },
+  { page: 'waitlist', labelKey: 'navWaitlist' },
 ];
 
 export function Header({ currentPage, onNavigate }: HeaderProps) {
   const { user, logout } = useAuth();
+  const { locale, setLocale, t } = useI18n();
 
   return (
     <header className="header">
       <div className="utility-bar">
-        <span>繁體中文</span>
-        <span>English</span>
-        <span>日本語</span>
+        <button type="button" className={locale === 'zh-TW' ? 'active' : ''} onClick={() => setLocale('zh-TW')}>
+          {t('languageTraditionalChinese')}
+        </button>
+        <button type="button" className={locale === 'en' ? 'active' : ''} onClick={() => setLocale('en')}>
+          {t('languageEnglish')}
+        </button>
+        <button type="button" className={locale === 'ja' ? 'active' : ''} onClick={() => setLocale('ja')}>
+          {t('languageJapanese')}
+        </button>
       </div>
       <div className="header-container">
         <div className="brand-block">
           <div>
-            <h1 className="logo">台灣高鐵網路訂票系統</h1>
-            <p>Taiwan High Speed Rail Online Booking</p>
+            <h1 className="logo">{t('appTitle')}</h1>
+            <p>{t('appSubtitle')}</p>
           </div>
         </div>
         {user && (
@@ -39,7 +47,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
                 className={currentPage === item.page ? 'active' : ''}
                 onClick={() => onNavigate(item.page)}
               >
-                {item.label}
+                {t(item.labelKey)}
               </button>
             ))}
           </nav>
@@ -48,14 +56,14 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
           {user ? (
             <>
               <span className="user-info">
-                {user.name} (TGo: {user.tgo_balance} 點)
+                {user.name} ({t('tgoPoints')}: {user.tgo_balance})
               </span>
               <button onClick={logout} className="btn-logout">
-                登出
+                {t('logout')}
               </button>
             </>
           ) : (
-            <span className="auth-prompt">請先登入</span>
+            <span className="auth-prompt">{t('loginRequired')}</span>
           )}
         </div>
       </div>

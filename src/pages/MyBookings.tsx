@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import type { Order, Station } from '../types';
 import apiService from '../services/api';
+import { useI18n } from '../i18n';
 import '../styles/MyBookings.css';
 
 interface MyBookingsProps {
@@ -13,6 +14,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+  const { t } = useI18n();
 
   const loadOrders = async () => {
     try {
@@ -20,7 +22,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
       setOrders(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '載入訂單失敗');
+      setError(err instanceof Error ? err.message : t('loadOrdersFailed'));
     } finally {
       setLoading(false);
     }
@@ -31,7 +33,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
   }, []);
 
   const handleRefund = async (orderId: number, ticketId: number) => {
-    if (!window.confirm('確認退票？')) return;
+    if (!window.confirm(t('confirmRefund'))) return;
 
     try {
       const updatedOrder = await apiService.refundTicket(orderId, ticketId);
@@ -39,12 +41,12 @@ export function MyBookings({ stations }: MyBookingsProps) {
         orders.map((o) => (o.order_id === orderId ? updatedOrder : o))
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : '退票失敗');
+      alert(err instanceof Error ? err.message : t('refundFailed'));
     }
   };
 
   const handleCancelOrder = async (orderId: number) => {
-    if (!window.confirm('確認取消訂單？')) return;
+    if (!window.confirm(t('confirmCancelOrder'))) return;
 
     try {
       const updatedOrder = await apiService.cancelOrder(orderId);
@@ -52,7 +54,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
         orders.map((o) => (o.order_id === orderId ? updatedOrder : o))
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : '取消訂單失敗');
+      alert(err instanceof Error ? err.message : t('cancelOrderFailed'));
     }
   };
 
@@ -61,46 +63,27 @@ export function MyBookings({ stations }: MyBookingsProps) {
   };
 
   const getPaymentStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      unpaid: '未付款',
-      paid: '已付款',
-      cancelled: '已取消',
-    };
-    return labels[status] || status;
+    return t(status) || status;
   };
 
   const getTicketStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      valid: '有效',
-      used: '已使用',
-      refunded: '已退票',
-    };
-    return labels[status] || status;
+    return t(status) || status;
   };
 
   const getTicketTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      full: '全票',
-      'early-bird': '早鳥',
-      student: '大學生',
-      elderly: '敬老',
-      companion: '愛心',
-      friend: '愛陪',
-      child: '兒童',
-    };
-    return labels[type] || type;
+    return t(type) || type;
   };
 
   if (loading) {
-    return <div className="loading">載入中...</div>;
+    return <div className="loading">{t('loading')}</div>;
   }
 
   if (orders.length === 0) {
     return (
       <div className="my-bookings">
-        <h2>我的訂單</h2>
+        <h2>{t('myOrders')}</h2>
         <div className="empty-state">
-          <p>尚無訂單</p>
+          <p>{t('emptyOrders')}</p>
         </div>
       </div>
     );
@@ -108,7 +91,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
 
   return (
     <div className="my-bookings">
-      <h2>我的訂單</h2>
+      <h2>{t('myOrders')}</h2>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -118,7 +101,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
             <div className="order-header" onClick={() => setExpandedOrder(expandedOrder === order.order_id ? null : order.order_id)}>
               <div className="order-info">
                 <div className="booking-code">
-                  <strong>訂位代號:</strong> {order.booking_code}
+                  <strong>{t('bookingCode')}:</strong> {order.booking_code}
                 </div>
                 <div className="order-status">
                   <span className={`status-badge ${order.payment_status}`}>
@@ -133,22 +116,22 @@ export function MyBookings({ stations }: MyBookingsProps) {
             {expandedOrder === order.order_id && (
               <div className="order-details">
                 <div className="tickets">
-                  <h4>車票</h4>
+                  <h4>{t('ticketDetails')}</h4>
                   {(order.tickets ?? order.order_tickets ?? []).map((ticket) => (
                     <div key={ticket.ticket_id} className="ticket-detail">
                       <div className="ticket-info">
                         <p>
-                          <strong>路線:</strong> {getStationName(ticket.start_station_id)} →{' '}
+                          <strong>{t('route')}:</strong> {getStationName(ticket.start_station_id)} →{' '}
                           {getStationName(ticket.end_station_id)}
                         </p>
                         <p>
-                          <strong>票種:</strong> {getTicketTypeLabel(ticket.ticket_type)}
+                          <strong>{t('ticketType')}:</strong> {getTicketTypeLabel(ticket.ticket_type)}
                         </p>
                         <p>
-                          <strong>金額:</strong> NT$ {ticket.actual_price.toLocaleString()}
+                          <strong>{t('amount')}:</strong> NT$ {ticket.actual_price.toLocaleString()}
                         </p>
                         <p>
-                          <strong>狀態:</strong> {getTicketStatusLabel(ticket.ticket_status)}
+                          <strong>{t('status')}:</strong> {getTicketStatusLabel(ticket.ticket_status)}
                         </p>
                       </div>
                       {ticket.ticket_status === 'valid' && order.payment_status === 'paid' && (
@@ -156,13 +139,13 @@ export function MyBookings({ stations }: MyBookingsProps) {
                           onClick={() => handleRefund(order.order_id, ticket.ticket_id)}
                           className="btn-refund"
                         >
-                          退票
+                          {t('refund')}
                         </button>
                       )}
                     </div>
                   ))}
                   {(order.tickets ?? order.order_tickets ?? []).length === 0 && (
-                    <p>這筆訂單沒有車票明細。</p>
+                    <p>{t('noTicketDetails')}</p>
                   )}
                 </div>
 
@@ -172,7 +155,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
                       onClick={() => handleCancelOrder(order.order_id)}
                       className="btn-danger"
                     >
-                      取消訂單
+                      {t('cancelOrder')}
                     </button>
                   </div>
                 )}

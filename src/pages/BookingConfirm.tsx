@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Order } from '../types';
 import apiService from '../services/api';
 import type { TicketInfo } from './SeatSelection';
+import { useI18n } from '../i18n';
 import '../styles/BookingConfirm.css';
 
 interface BookingConfirmProps {
@@ -15,12 +16,13 @@ export function BookingConfirm({ tickets, scheduleId, onConfirm, onBack }: Booki
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreed, setAgreed] = useState(false);
+  const { t } = useI18n();
 
   const totalPrice = tickets.reduce((sum, t) => sum + t.price, 0);
 
   const handleConfirm = async () => {
     if (!agreed) {
-      alert('請同意條款');
+      alert(t('agreeAlert'));
       return;
     }
 
@@ -41,7 +43,7 @@ export function BookingConfirm({ tickets, scheduleId, onConfirm, onBack }: Booki
       const order = await apiService.createOrder(orderRequest);
       onConfirm(order);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '訂單建立失敗');
+      setError(err instanceof Error ? err.message : t('createOrderFailed'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -50,21 +52,21 @@ export function BookingConfirm({ tickets, scheduleId, onConfirm, onBack }: Booki
 
   return (
     <div className="booking-confirm-container">
-      <h2>確認訂單</h2>
+      <h2>{t('confirmOrder')}</h2>
 
       {error && <div className="error-message">{error}</div>}
 
       <div className="ticket-list">
-        <h3>訂票明細</h3>
+        <h3>{t('ticketDetails')}</h3>
         {tickets.map((ticket, index) => (
           <div key={index} className="ticket-item">
-            <div className="ticket-number">座位 #{index + 1}</div>
+            <div className="ticket-number">{t('seatNumber', { no: index + 1 })}</div>
             <div className="ticket-details">
               <p>
-                <strong>票種:</strong> {getTicketTypeLabel(ticket.ticketType)}
+                <strong>{t('ticketType')}:</strong> {t(ticket.ticketType)}
               </p>
               <p>
-                <strong>金額:</strong> NT$ {ticket.price.toLocaleString()}
+                <strong>{t('amount')}:</strong> NT$ {ticket.price.toLocaleString()}
               </p>
             </div>
           </div>
@@ -73,11 +75,11 @@ export function BookingConfirm({ tickets, scheduleId, onConfirm, onBack }: Booki
 
       <div className="summary">
         <div className="summary-row">
-          <span>票數:</span>
-          <span>{tickets.length} 張</span>
+          <span>{t('ticketCount')}:</span>
+          <span>{t('ticketsUnit', { count: tickets.length })}</span>
         </div>
         <div className="summary-row total">
-          <span>總金額:</span>
+          <span>{t('totalAmount')}:</span>
           <span>NT$ {totalPrice.toLocaleString()}</span>
         </div>
       </div>
@@ -89,35 +91,22 @@ export function BookingConfirm({ tickets, scheduleId, onConfirm, onBack }: Booki
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
           />
-          我同意台灣高鐵訂票系統的條款與條件
+          {t('agreeTerms')}
         </label>
       </div>
 
       <div className="actions">
         <button onClick={onBack} className="btn-secondary" disabled={loading}>
-          上一步
+          {t('previous')}
         </button>
         <button
           onClick={handleConfirm}
           disabled={!agreed || loading}
           className="btn-primary"
         >
-          {loading ? '處理中...' : '確認訂單'}
+          {loading ? t('processing') : t('confirmOrder')}
         </button>
       </div>
     </div>
   );
-}
-
-function getTicketTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    full: '全票',
-    'early-bird': '早鳥',
-    student: '大學生',
-    elderly: '敬老',
-    companion: '愛心',
-    friend: '愛陪',
-    child: '兒童',
-  };
-  return labels[type] || type;
 }
