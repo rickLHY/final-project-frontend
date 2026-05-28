@@ -1,0 +1,190 @@
+.my-bookings {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.my-bookings h2 {
+  margin-bottom: 24px;
+  color: #1976d2;
+}
+
+.empty-state {
+  background: white;
+  border-radius: 8px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state p {
+  color: #999;
+  font-size: 16px;
+}
+
+.orders-list {
+  display: grid;
+  gap: 16px;
+}
+
+.order-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.order-header:hover {
+  background-color: #f5f5f5;
+}
+
+.order-info {
+  flex: 1;
+}
+
+.booking-code {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.booking-code strong {
+  color: #1976d2;
+}
+
+.order-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1976d2;
+  min-width: 120px;
+  text-align: right;
+}
+
+.expand-icon {
+  margin-left: 12px;
+  color: #666;
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.order-header[aria-expanded='true'] .expand-icon {
+  transform: rotate(180deg);
+}
+
+.order-details {
+  padding: 16px;
+  border-top: 1px solid #eee;
+}
+
+.tickets {
+  margin-bottom: 16px;
+}
+
+.tickets h4 {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ticket-detail {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ticket-info {
+  flex: 1;
+}
+
+.ticket-info p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.ticket-info strong {
+  color: #333;
+}
+
+.btn-refund {
+  background-color: #f57c00;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-refund:hover {
+  background-color: #e65100;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.btn-danger {
+  background-color: #d32f2f;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-danger:hover {
+  background-color: #b71c1c;
+}
+
+@media (max-width: 768px) {
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-amount {
+    text-align: left;
+    margin-top: 8px;
+  }
+
+  .ticket-detail {
+    flex-direction: column;
+  }
+
+  .btn-refund {
+    width: 100%;
+    text-align: center;
+  }
+}

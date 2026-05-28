@@ -1,0 +1,248 @@
+.seat-selection-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-info {
+  margin-bottom: 24px;
+}
+
+.header-info h2 {
+  margin-bottom: 8px;
+  color: #1976d2;
+}
+
+.route-info {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.route-info span:nth-child(1),
+.route-info span:nth-child(3) {
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.seat-selection {
+  margin: 24px 0;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.legend div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seat-available,
+.seat-occupied,
+.seat-selected {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid #ddd;
+}
+
+.seat-available {
+  background-color: #e8f5e9;
+  color: #388e3c;
+  border-color: #388e3c;
+}
+
+.seat-occupied {
+  background-color: #f5f5f5;
+  color: #999;
+  border-color: #ccc;
+}
+
+.seat-selected {
+  background-color: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+
+.carriage {
+  margin-bottom: 32px;
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+.carriage h4 {
+  margin-bottom: 16px;
+  text-align: center;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.seats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.seat-button-wrapper {
+  position: relative;
+}
+
+.seat-button {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #666;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+}
+
+.seat-button.available {
+  background-color: #e8f5e9;
+  color: #388e3c;
+  border-color: #388e3c;
+  cursor: pointer;
+}
+
+.seat-button.available:hover {
+  background-color: #81c784;
+  border-color: #2e7d32;
+  color: white;
+}
+
+.seat-button.occupied {
+  background-color: #f5f5f5;
+  color: #ccc;
+  border-color: #ddd;
+  cursor: not-allowed;
+}
+
+.seat-button.selected {
+  background-color: #1976d2;
+  color: white;
+  border-color: #1565c0;
+}
+
+.seat-button.business {
+  border: 2px dashed #ff9800;
+}
+
+.seat-button:disabled:not(.selected) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ticket-type-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  min-width: 120px;
+  margin-bottom: 8px;
+}
+
+.ticket-type-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.ticket-type-option:last-child {
+  border-bottom: none;
+}
+
+.ticket-type-option:hover {
+  background-color: #f5f5f5;
+  color: #1976d2;
+}
+
+.booking-summary {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 24px;
+  border-top: 2px solid #1976d2;
+}
+
+.summary-items {
+  margin-bottom: 16px;
+}
+
+.summary-items p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.total-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.actions button {
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .seats-grid {
+    max-width: 100%;
+  }
+
+  .legend {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
