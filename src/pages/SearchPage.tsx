@@ -20,6 +20,20 @@ export interface SearchSelection {
 
 const LEVEL_CLASS: Record<string, string> = { low: 'congestion-low', medium: 'congestion-medium', high: 'congestion-high', full: 'congestion-full' };
 
+function Pagination({ current, total, count, onChange }: { current: number; total: number; count: number; onChange: (p: number) => void }) {
+  if (total <= 1) return null;
+  return (
+    <div className="pagination">
+      <button className="page-btn" onClick={() => onChange(Math.max(1, current - 1))} disabled={current === 1}>‹ 上一頁</button>
+      {Array.from({ length: total }, (_, i) => i + 1).map((p) => (
+        <button key={p} className={`page-btn${current === p ? ' active' : ''}`} onClick={() => onChange(p)}>{p}</button>
+      ))}
+      <button className="page-btn" onClick={() => onChange(Math.min(total, current + 1))} disabled={current === total}>下一頁 ›</button>
+      <span className="page-info">第 {current} / {total} 頁，共 {count} 筆</span>
+    </div>
+  );
+}
+
 function OccupancyBar({ rate }: { rate: number }) {
   const color = rate >= 90 ? '#e53935' : rate >= 60 ? '#fb8c00' : '#43a047';
   return (
@@ -56,6 +70,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const [nrResults, setNrResults] = useState<NonReservedAvailability[] | null>(null);
   const [nrLoading, setNrLoading] = useState(false);
   const [nrError, setNrError] = useState<string | null>(null);
+  const [nrPage, setNrPage] = useState(1);
 
   // ── Peak sales tab state ────────────────────────────────────────────────────
   const sevenDaysLater = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
@@ -64,6 +79,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const [psResults, setPsResults] = useState<PeakSalesSummary[] | null>(null);
   const [psLoading, setPsLoading] = useState(false);
   const [psError, setPsError] = useState<string | null>(null);
+  const [psPage, setPsPage] = useState(1);
 
   const loadStations = async () => {
     try {
@@ -120,7 +136,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
     e.preventDefault();
     if (!nrStationId) return;
     setNrError(null); setNrLoading(true);
-    try { setNrResults(await apiService.getNonReservedAvailability(nrDate, Number(nrStationId))); }
+    try { setNrResults(await apiService.getNonReservedAvailability(nrDate, Number(nrStationId))); setNrPage(1); }
     catch (err) { setNrError(err instanceof Error ? err.message : '查詢失敗'); }
     finally { setNrLoading(false); }
   };
@@ -128,7 +144,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
   const handlePsSearch = async (e: FormEvent) => {
     e.preventDefault();
     setPsError(null); setPsLoading(true);
-    try { setPsResults(await apiService.getPeakSales(psStart, psEnd)); }
+    try { setPsResults(await apiService.getPeakSales(psStart, psEnd)); setPsPage(1); }
     catch (err) { setPsError(err instanceof Error ? err.message : '查詢失敗'); }
     finally { setPsLoading(false); }
   };
@@ -193,22 +209,27 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
               </div>
             </form>
             {nrError && <div className="error-message">{nrError}</div>}
-            {nrResults !== null && (nrResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (
-              <table className="data-table">
-                <thead><tr><th>{t('trainNo')}</th><th>{t('trainType')}</th><th>{t('departureTime')}</th><th>{t('nonReservedTotal')}</th><th>{t('occupied')}</th><th>{t('remaining')}</th><th>{t('congestionLevel')}</th></tr></thead>
-                <tbody>{nrResults.map(r => (
-                  <tr key={r.schedule_id}>
-                    <td>{r.train_no}</td>
-                    <td>{r.train_type === 'express' ? t('trainTypeExpress') : t('trainTypeLocal')}</td>
-                    <td>{r.departure_time?.slice(0, 5) ?? '—'}</td>
-                    <td>{r.non_reserved_total}</td>
-                    <td>{r.non_reserved_sold}</td>
-                    <td>{r.non_reserved_available}</td>
-                    <td><span className={`congestion-badge ${LEVEL_CLASS[r.congestion_level]}`}>{t(`congestion${r.congestion_level.charAt(0).toUpperCase() + r.congestion_level.slice(1)}`)}</span></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            ))}
+            {nrResults !== null && (nrResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (() => {
+              const nrTotal = Math.ceil(nrResults.length / PAGE_SIZE);
+              const nrPaged = nrResults.slice((nrPage - 1) * PAGE_SIZE, nrPage * PAGE_SIZE);
+              return (<>
+                <table className="data-table">
+                  <thead><tr><th>{t('trainNo')}</th><th>{t('trainType')}</th><th>{t('departureTime')}</th><th>{t('nonReservedTotal')}</th><th>{t('occupied')}</th><th>{t('remaining')}</th><th>{t('congestionLevel')}</th></tr></thead>
+                  <tbody>{nrPaged.map(r => (
+                    <tr key={r.schedule_id}>
+                      <td>{r.train_no}</td>
+                      <td>{r.train_type === 'express' ? t('trainTypeExpress') : t('trainTypeLocal')}</td>
+                      <td>{r.departure_time?.slice(0, 5) ?? '—'}</td>
+                      <td>{r.non_reserved_total}</td>
+                      <td>{r.non_reserved_sold}</td>
+                      <td>{r.non_reserved_available}</td>
+                      <td><span className={`congestion-badge ${LEVEL_CLASS[r.congestion_level]}`}>{t(`congestion${r.congestion_level.charAt(0).toUpperCase() + r.congestion_level.slice(1)}`)}</span></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+                <Pagination current={nrPage} total={nrTotal} count={nrResults.length} onChange={setNrPage} />
+              </>);
+            })())}
           </div>
         )}
 
@@ -230,24 +251,29 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
               </div>
             </form>
             {psError && <div className="error-message">{psError}</div>}
-            {psResults !== null && (psResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (
-              <table className="data-table">
-                <thead><tr><th>{t('date')}</th><th>{t('trainNo')}</th><th>{t('trainType')}</th><th>{t('firstDeparture')}</th><th>{t('lastArrival')}</th><th>{t('totalSeats')}</th><th>{t('soldSeats')}</th><th>{t('remaining')}</th><th>{t('occupancyRate')}</th></tr></thead>
-                <tbody>{psResults.map(r => (
-                  <tr key={r.schedule_id}>
-                    <td>{r.departure_date}</td>
-                    <td>{r.train_no}</td>
-                    <td>{r.train_type === 'express' ? t('trainTypeExpress') : t('trainTypeLocal')}</td>
-                    <td>{r.first_departure_time?.slice(0, 5) ?? '—'}</td>
-                    <td>{r.last_arrival_time?.slice(0, 5) ?? '—'}</td>
-                    <td>{r.total_seats}</td>
-                    <td>{r.sold_seats}</td>
-                    <td>{r.available_seats}</td>
-                    <td><OccupancyBar rate={r.occupancy_rate} /></td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            ))}
+            {psResults !== null && (psResults.length === 0 ? <p className="empty-state">{t('noSchedules')}</p> : (() => {
+              const psTotal = Math.ceil(psResults.length / PAGE_SIZE);
+              const psPaged = psResults.slice((psPage - 1) * PAGE_SIZE, psPage * PAGE_SIZE);
+              return (<>
+                <table className="data-table">
+                  <thead><tr><th>{t('date')}</th><th>{t('trainNo')}</th><th>{t('trainType')}</th><th>{t('firstDeparture')}</th><th>{t('lastArrival')}</th><th>{t('totalSeats')}</th><th>{t('soldSeats')}</th><th>{t('remaining')}</th><th>{t('occupancyRate')}</th></tr></thead>
+                  <tbody>{psPaged.map(r => (
+                    <tr key={r.schedule_id}>
+                      <td>{r.departure_date}</td>
+                      <td>{r.train_no}</td>
+                      <td>{r.train_type === 'express' ? t('trainTypeExpress') : t('trainTypeLocal')}</td>
+                      <td>{r.first_departure_time?.slice(0, 5) ?? '—'}</td>
+                      <td>{r.last_arrival_time?.slice(0, 5) ?? '—'}</td>
+                      <td>{r.total_seats}</td>
+                      <td>{r.sold_seats}</td>
+                      <td>{r.available_seats}</td>
+                      <td><OccupancyBar rate={r.occupancy_rate} /></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+                <Pagination current={psPage} total={psTotal} count={psResults.length} onChange={setPsPage} />
+              </>);
+            })())}
           </div>
         )}
 
