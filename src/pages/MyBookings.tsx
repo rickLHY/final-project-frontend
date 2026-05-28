@@ -109,7 +109,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
                   </span>
                 </div>
               </div>
-              <div className="order-amount">NT$ {order.total_amount.toLocaleString()}</div>
+              <div className="order-amount">NT$ {(order.total_amount ?? 0).toLocaleString()}</div>
               <div className="expand-icon">{expandedOrder === order.order_id ? '▼' : '▶'}</div>
             </div>
 
@@ -128,7 +128,7 @@ export function MyBookings({ stations }: MyBookingsProps) {
                           <strong>{t('ticketType')}:</strong> {getTicketTypeLabel(ticket.ticket_type)}
                         </p>
                         <p>
-                          <strong>{t('amount')}:</strong> NT$ {ticket.actual_price.toLocaleString()}
+                          <strong>{t('amount')}:</strong> NT$ {(ticket.actual_price ?? 0).toLocaleString()}
                         </p>
                         <p>
                           <strong>{t('status')}:</strong> {getTicketStatusLabel(ticket.ticket_status)}

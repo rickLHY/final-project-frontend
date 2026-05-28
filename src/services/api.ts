@@ -253,7 +253,8 @@ class ApiService {
       method: 'PUT',
       headers: this.getHeaders(),
     });
-    return this.handleResponse<Order>(response);
+    await this.handleResponse<unknown>(response);
+    return this.getOrder(orderId);
   }
 
   async cancelOrder(orderId: number): Promise<Order> {
@@ -261,7 +262,8 @@ class ApiService {
       method: 'PUT',
       headers: this.getHeaders(),
     });
-    return this.handleResponse<Order>(response);
+    await this.handleResponse<unknown>(response);
+    return this.getOrder(orderId);
   }
 
   async refundTicket(orderId: number, ticketId: number): Promise<Order> {
