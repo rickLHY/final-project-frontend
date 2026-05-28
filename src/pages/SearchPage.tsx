@@ -22,12 +22,26 @@ const LEVEL_CLASS: Record<string, string> = { low: 'congestion-low', medium: 'co
 
 function Pagination({ current, total, count, onChange }: { current: number; total: number; count: number; onChange: (p: number) => void }) {
   if (total <= 1) return null;
+
+  const pages: (number | '...')[] = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push('...');
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+  }
+
   return (
     <div className="pagination">
       <button className="page-btn" onClick={() => onChange(Math.max(1, current - 1))} disabled={current === 1}>‹ 上一頁</button>
-      {Array.from({ length: total }, (_, i) => i + 1).map((p) => (
-        <button key={p} className={`page-btn${current === p ? ' active' : ''}`} onClick={() => onChange(p)}>{p}</button>
-      ))}
+      {pages.map((p, i) =>
+        p === '...'
+          ? <span key={`dots-${i}`} className="page-dots">…</span>
+          : <button key={p} className={`page-btn${current === p ? ' active' : ''}`} onClick={() => onChange(p)}>{p}</button>
+      )}
       <button className="page-btn" onClick={() => onChange(Math.min(total, current + 1))} disabled={current === total}>下一頁 ›</button>
       <span className="page-info">第 {current} / {total} 頁，共 {count} 筆</span>
     </div>
@@ -455,39 +469,7 @@ export function SearchPage({ onSelectSchedule }: SearchPageProps) {
               </div>
             ))}
 
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  className="page-btn"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  ‹ 上一頁
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    className={`page-btn${currentPage === page ? ' active' : ''}`}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </button>
-                ))}
-
-                <button
-                  className="page-btn"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  下一頁 ›
-                </button>
-
-                <span className="page-info">
-                  第 {currentPage} / {totalPages} 頁，共 {schedules.length} 班
-                </span>
-              </div>
-            )}
+            <Pagination current={currentPage} total={totalPages} count={schedules.length} onChange={setCurrentPage} />
           </div>
         );
       })()}
