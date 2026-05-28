@@ -48,7 +48,7 @@
 }
 
 .order-header:hover {
-  background-color: #f7f2ec;
+  background-color: #f8f9fa;
 }
 
 .order-info {
@@ -101,13 +101,13 @@
 .tickets h4 {
   margin-bottom: 12px;
   font-size: 13px;
-  color: #3f3832;
+  color: #343a40;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .ticket-detail {
-  background-color: #fbf8f3;
+  background-color: #ffffff;
   padding: 12px;
   margin-bottom: 8px;
   display: flex;
@@ -127,7 +127,7 @@
 }
 
 .ticket-info strong {
-  color: #3f3832;
+  color: #343a40;
 }
 
 .btn-refund {

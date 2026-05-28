@@ -5,19 +5,19 @@
 }
 
 :root {
-  --primary-color: #8f1d2c;
-  --secondary-color: #64131f;
-  --accent-color: #b98a48;
+  --primary-color: #dd5000;
+  --secondary-color: #b94000;
+  --accent-color: #ff9900;
   --success-color: #2f7d4f;
   --danger-color: #b3261e;
   --warning-color: #a66300;
-  --text-color: #2d2a26;
-  --muted-color: #6b625a;
-  --border-color: #d8d1c8;
-  --background-color: #f4f1ec;
-  --surface-color: #fffdf9;
-  --table-head: #efe8df;
-  --shadow: 0 10px 30px rgba(52, 38, 30, 0.10);
+  --text-color: #212529;
+  --muted-color: #6c757d;
+  --border-color: #dee2e6;
+  --background-color: #f8f9fa;
+  --surface-color: #ffffff;
+  --table-head: #f1f3f5;
+  --shadow: 0 2px 8px rgba(33, 37, 41, 0.08);
 }
 
 body {
@@ -28,24 +28,14 @@ body {
   background-color: var(--background-color);
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(120deg, rgba(143, 29, 44, 0.08), transparent 34%),
-    repeating-linear-gradient(90deg, rgba(143, 29, 44, 0.035) 0 1px, transparent 1px 90px);
-}
-
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 9px 18px;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 button:disabled {
@@ -57,23 +47,20 @@ button:disabled {
   background-color: var(--primary-color);
   color: white;
   font-weight: 600;
-  border-bottom: 3px solid var(--secondary-color);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--secondary-color);
-  box-shadow: var(--shadow);
 }
 
 .btn-secondary {
-  background-color: #5f5a54;
+  background-color: #565656;
   color: white;
   font-weight: 600;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #777;
-  box-shadow: var(--shadow);
+  background-color: #444;
 }
 
 .btn-danger {
@@ -84,7 +71,6 @@ button:disabled {
 
 .btn-danger:hover:not(:disabled) {
   background-color: #b71c1c;
-  box-shadow: var(--shadow);
 }
 
 .btn-refund {
@@ -137,7 +123,7 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  box-shadow: 0 0 0 3px rgba(221, 80, 0, 0.14);
 }
 
 .error-message {
@@ -214,8 +200,8 @@ textarea:focus {
 }
 
 .status-badge.cancelled {
-  background-color: #eee8e2;
-  color: #6b625a;
+  background-color: #eeeeee;
+  color: #666666;
 }
 
 .status-badge.matched {
